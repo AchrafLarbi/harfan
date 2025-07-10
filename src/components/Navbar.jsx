@@ -40,17 +40,23 @@ export default function ArabicNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
-    { label: "الرئيسية", href: "/", active: true },
-    { label: "من نحن", href: "/about" },
-    { label: "المميزات", href: "/features" },
-    { label: "الخطط", href: "/plans" },
-    { label: "تواصل معنا", href: "/contact" },
-    { label: "تسجيل الدخول", href: "/login" },
+    { label: "الرئيسية", href: "#home" },
+    { label: "من نحن", href: "#about" },
+    { label: "المميزات", href: "#features" },
+    { label: "الخطط", href: "#plans" },
+    { label: "تواصل معنا", href: "#contact" },
+    { label: "تسجيل الدخول", href: "/login" }, // keep login as a route
   ];
 
   const handleNavClick = (href) => {
-    // Handle navigation - you can implement your routing logic here
-    console.log("Navigate to:", href);
+    if (href.startsWith("#")) {
+      const section = document.querySelector(href);
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.location.href = href;
+    }
     setIsMenuOpen(false);
   };
 
@@ -77,7 +83,7 @@ export default function ArabicNavbar() {
             <div className="flex items-center justify-between w-full space-x-6 space-x-reverse">
               {/* All navigation items with logo treated as an item */}
               <a
-                href="/"
+                href="#home"
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavClick("/");
@@ -93,10 +99,10 @@ export default function ArabicNavbar() {
               </a>
 
               <a
-                href="/about"
+                href="#about"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick("/about");
+                  handleNavClick("#about");
                 }}
                 className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
               >
@@ -104,10 +110,10 @@ export default function ArabicNavbar() {
               </a>
 
               <a
-                href="/features"
+                href="#features"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick("/features");
+                  handleNavClick("#features");
                 }}
                 className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
               >
@@ -127,10 +133,10 @@ export default function ArabicNavbar() {
               </a>
 
               <a
-                href="/plans"
+                href="#plans"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick("/plans");
+                  handleNavClick("#plans");
                 }}
                 className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
               >
@@ -138,10 +144,10 @@ export default function ArabicNavbar() {
               </a>
 
               <a
-                href="/contact"
+                href="#contact"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick("/contact");
+                  handleNavClick("#contact");
                 }}
                 className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
               >
@@ -191,11 +197,14 @@ export default function ArabicNavbar() {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
-                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 hover:text-primary hover:bg-gray-50 rounded-md cursor-pointer ${
-                    item.active ? "text-primary bg-secondary" : "text-primary"
+                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer relative ${
+                    index === 0 ? "text-primary" : "text-gray-700"
                   }`}
                 >
                   {item.label}
+                  {index === 0 && (
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
+                  )}
                 </a>
               ))}
             </div>
