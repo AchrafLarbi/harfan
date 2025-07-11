@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/logo/logo.png";
 
 // Simple Menu and X icons as SVG components
@@ -38,15 +38,40 @@ const XIcon = () => (
 
 export default function ArabicNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
 
   const navigationItems = [
-    { label: "الرئيسية", href: "#home" },
-    { label: "من نحن", href: "#about" },
-    { label: "المميزات", href: "#features" },
-    { label: "الخطط", href: "#plans" },
-    { label: "تواصل معنا", href: "#contact" },
-    { label: "تسجيل الدخول", href: "/login" }, // keep login as a route
+    { label: "الرئيسية", href: "#home", id: "home" },
+    { label: "من نحن", href: "#about", id: "about" },
+    { label: "المميزات", href: "#features", id: "features" },
+    { label: "الخطط", href: "#plans", id: "plans" },
+    { label: "تواصل معنا", href: "#contact", id: "contact" },
+    { label: "تسجيل الدخول", href: "/login", id: "login" }, // keep login as a route
   ];
+
+  // Function to detect active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = navigationItems.filter((item) => item.id !== "login");
+      const scrollPosition = window.scrollY + 100; // Add offset for better detection
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i].id);
+        if (section) {
+          const sectionTop = section.offsetTop;
+          if (scrollPosition >= sectionTop) {
+            setActiveSection(sections[i].id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Call once to set initial active section
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleNavClick = (href) => {
     if (href.startsWith("#")) {
@@ -80,45 +105,26 @@ export default function ArabicNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:justify-between lg:w-full lg:px-8">
-            <div className="flex items-center justify-between w-full space-x-6 space-x-reverse">
-              {/* All navigation items with logo treated as an item */}
-              <a
-                href="#home"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("/");
-                }}
-                className={`text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer relative ${
-                  navigationItems[0].active ? "text-primary" : "text-primary"
-                }`}
-              >
-                {navigationItems[0].label}
-                {navigationItems[0].active && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
-                )}
-              </a>
-
-              <a
-                href="#about"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("#about");
-                }}
-                className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
-              >
-                {navigationItems[1].label}
-              </a>
-
-              <a
-                href="#features"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("#features");
-                }}
-                className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
-              >
-                {navigationItems[2].label}
-              </a>
+            <div className="flex items-center justify-between w-full font-bold space-x-6 space-x-reverse">
+              {/* Navigation items before logo */}
+              {navigationItems.slice(0, 3).map((item) => (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(item.href);
+                  }}
+                  className={`text-base font-semibold transition-colors duration-200 hover:text-primary cursor-pointer relative ${
+                    activeSection === item.id ? "text-primary" : "text-gray-700"
+                  }`}
+                >
+                  {item.label}
+                  {activeSection === item.id && (
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
+                  )}
+                </a>
+              ))}
 
               {/* Logo as navigation item */}
               <a
@@ -132,38 +138,25 @@ export default function ArabicNavbar() {
                 <img src={logo} className="w-12 h-12 object-contain" />
               </a>
 
-              <a
-                href="#plans"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("#plans");
-                }}
-                className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
-              >
-                {navigationItems[3].label}
-              </a>
-
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("#contact");
-                }}
-                className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
-              >
-                {navigationItems[4].label}
-              </a>
-
-              <a
-                href="/login"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("/login");
-                }}
-                className="text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer text-gray-700"
-              >
-                {navigationItems[5].label}
-              </a>
+              {/* Navigation items after logo */}
+              {navigationItems.slice(3).map((item) => (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(item.href);
+                  }}
+                  className={`text-base font-semibold transition-colors duration-200 hover:text-primary cursor-pointer relative ${
+                    activeSection === item.id ? "text-primary" : "text-gray-700"
+                  }`}
+                >
+                  {item.label}
+                  {activeSection === item.id && item.id !== "login" && (
+                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
+                  )}
+                </a>
+              ))}
             </div>
           </div>
 
@@ -189,22 +182,21 @@ export default function ArabicNavbar() {
         {isMenuOpen && (
           <div className="lg:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white border border-gray-200 rounded-lg mt-2 shadow-xl">
-              {navigationItems.map((item, index) => (
+              {navigationItems.map((item) => (
                 <a
-                  key={index}
+                  key={item.id}
                   href={item.href}
                   onClick={(e) => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
                   className={`block px-3 py-2 text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer relative ${
-                    index === 0 ? "text-primary" : "text-gray-700"
+                    activeSection === item.id
+                      ? "text-primary bg-secondary underline decoration-primary"
+                      : "text-gray-700"
                   }`}
                 >
                   {item.label}
-                  {index === 0 && (
-                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
-                  )}
                 </a>
               ))}
             </div>

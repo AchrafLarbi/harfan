@@ -1,4 +1,28 @@
 export default function HeroSection() {
+  // Statistics data in JSON format
+  const statisticsData = [
+    {
+      id: 1,
+      number: "500+",
+      label: "طالب نشط",
+    },
+    {
+      id: 2,
+      number: "1000+",
+      label: "درس تفاعلي",
+    },
+    {
+      id: 3,
+      number: "50+",
+      label: "معلم متخصص",
+    },
+    {
+      id: 4,
+      number: "98%",
+      label: "رضا العملاء",
+    },
+  ];
+
   return (
     <section
       id="home"
@@ -32,19 +56,14 @@ export default function HeroSection() {
 
           {/* Main Heading */}
           <div className="mb-8">
-            <h1 className="text-6xl font-bold mb-6">
-              <span className="text-gray-800">منصة </span>
-              <div className="inline-flex items-center text-blue-600 relative">
-                {/* Text with underline */}
-                <span className="underline decoration-secondary decoration-6 underline-offset-5 ">
-                  حرفان
-                </span>
-
-                {/* SVG icon, right next to the text */}
+            <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
+              <span className="text-gray-800 font-bold">منصة</span>
+              <div className="flex flex-col items-center text-primary relative">
+                {/* SVG icon positioned above the text */}
                 <svg
-                  className="ml-5 inline-block align-middle"
-                  width="51"
-                  height="43"
+                  className="mt-1 mr-28"
+                  width="40"
+                  height="34"
                   viewBox="0 0 51 43"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -62,15 +81,20 @@ export default function HeroSection() {
                     fill="#333333"
                   />
                 </svg>
+
+                {/* Text with underline positioned below the SVG */}
+                <span className="font-bold underline decoration-secondary decoration-6 underline-offset-5">
+                  حرفان
+                </span>
               </div>
             </h1>
-            <h2 className="text-4xl font-bold text-gray-700">
+            <h2 className="text-5xl font-bold text-[#374151]">
               لتعلم العربية و القرآن الكريم
             </h2>
           </div>
 
           {/* Description */}
-          <p className="text-lg text-gray-500 max-w-3xl mx-auto mb-12 leading-relaxed">
+          <p className="text-xl text-gray-500 max-w-3xl mx-auto mb-12 leading-relaxed ">
             تعليم مبسط وتفاعلي، أنشطة حية ومحفزة، تواصل مباشر مع المعلمين، وتطور
             مستمر
             <br />
@@ -79,7 +103,7 @@ export default function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex gap-4 justify-center items-center mb-20">
-            <button className="bg-primary text-white font-medium px-8 py-4 rounded-full flex items-center gap-2">
+            <button className="bg-primary text-white font-medium px-6 py-3 rounded-full flex items-center gap-2">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -95,7 +119,7 @@ export default function HeroSection() {
               </svg>
               ابدأ رحلتك التعليمية
             </button>
-            <button className="border-2 border-primary text-primary font-medium px-8 py-4 rounded-full flex items-center gap-2">
+            <button className="border-2 border-primary text-primary font-medium px-6 py-3 rounded-full flex items-center gap-2">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -115,22 +139,16 @@ export default function HeroSection() {
 
           {/* Statistics */}
           <div className="grid grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">500+</div>
-              <div className="text-gray-500 font-medium">طالب نشط</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">1000+</div>
-              <div className="text-gray-500 font-medium">درس تفاعلي</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
-              <div className="text-gray-500 font-medium">معلم متخصص</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">98%</div>
-              <div className="text-gray-500 font-medium">رضا العملاء</div>
-            </div>
+            {statisticsData.map((stat) => (
+              <div key={stat.id} className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-500 font-medium text-xl">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
