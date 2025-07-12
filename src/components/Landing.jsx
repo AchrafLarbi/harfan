@@ -7,8 +7,10 @@ export default function Landing() {
   return (
     <div>
       <Navbar />
-      <Home />
-      <About />
+      <div className="pt-16 lg:pt-20">
+        <Home />
+        <About />
+      </div>
     </div>
   );
 }

@@ -39,6 +39,7 @@ const XIcon = () => (
 export default function ArabicNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const navigationItems = [
     { label: "الرئيسية", href: "#home", id: "home" },
@@ -49,17 +50,23 @@ export default function ArabicNavbar() {
     { label: "تسجيل الدخول", href: "/login", id: "login" }, // keep login as a route
   ];
 
-  // Function to detect active section
+  // Function to detect active section and scroll state
   useEffect(() => {
     const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+
+      // Update scroll state for navbar styling
+      setIsScrolled(scrollPosition > 10);
+
+      // Update active section
       const sections = navigationItems.filter((item) => item.id !== "login");
-      const scrollPosition = window.scrollY + 100; // Add offset for better detection
+      const offsetScrollPosition = scrollPosition + 100; // Add offset for better detection
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = document.getElementById(sections[i].id);
         if (section) {
           const sectionTop = section.offsetTop;
-          if (scrollPosition >= sectionTop) {
+          if (offsetScrollPosition >= sectionTop) {
             setActiveSection(sections[i].id);
             break;
           }
@@ -87,7 +94,11 @@ export default function ArabicNavbar() {
 
   return (
     <nav
-      className="bg-white text-gray-800 border-b border-gray-200 relative"
+      className={`text-gray-800 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "shadow-lg backdrop-blur-xl bg-white/80"
+          : "shadow-none  backdrop-blur-none"
+      }`}
       dir="rtl"
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
