@@ -7,7 +7,7 @@ export default function About() {
       <div className="max-w-7xl mx-auto ">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Right side - Content - Shows first on mobile */}
-          <div className="order-1 lg:order-1">
+          <div className="order-1 lg:order-1 pr-5">
             {/* Top badge */}
             <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8">
               <svg
@@ -31,7 +31,7 @@ export default function About() {
 
             {/* Main heading */}
             <div className="mb-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
+              <h1 className="text-6xl  font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
                 <span className="text-gray-800 font-bold">منصة</span>
                 <div className="flex flex-col items-start text-primary relative">
                   {/* SVG icon positioned above the text */}
@@ -63,7 +63,7 @@ export default function About() {
                   </span>
                 </div>
               </h1>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#374151]">
+              <h2 className="text-6xl font-bold text-[#374151]">
                 إسلامية متطورة{" "}
               </h2>
             </div>
