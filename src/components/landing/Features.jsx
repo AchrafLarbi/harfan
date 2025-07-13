@@ -116,7 +116,7 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="py-20 bg-gradient-to-br from-blue-50 to-purple-50"
+      className="py-20"
       dir="rtl"
     >
       <div className="max-w-7xl mx-auto px-6">

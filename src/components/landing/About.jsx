@@ -3,7 +3,7 @@ import background from "../../assets/landing/background.png";
 
 export default function About() {
   return (
-    <section id="about" className="py-20 bg-white" dir="rtl">
+    <section id="about" className="py-20" dir="rtl">
       <div className="max-w-7xl mx-auto ">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Right side - Content - Shows first on mobile */}

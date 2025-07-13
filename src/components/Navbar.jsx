@@ -96,7 +96,7 @@ export default function ArabicNavbar() {
     <nav
       className={`text-gray-800 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "shadow-lg backdrop-blur-xl bg-white/80"
+          ? "shadow-lg backdrop-blur-lg bg-white/40"
           : "shadow-none  backdrop-blur-none"
       }`}
       dir="rtl"
@@ -146,7 +146,7 @@ export default function ArabicNavbar() {
                 }}
                 className="flex-shrink-0 transition-transform duration-200 hover:scale-105 "
               >
-                <img src={logo} className="w-12 h-12 object-contain" />
+                <img src={logo} className="w-16 h-16 object-contain" />
               </a>
 
               {/* Navigation items after logo */}

@@ -26,9 +26,8 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="min-h-screen bg-purple-50"
+      className="min-h-screen"
       dir="rtl"
-      style={{ backgroundColor: "#f8f7ff" }}
     >
       <div className="max-w-6xl mx-auto px-6 p-10">
         <div className="text-center">
