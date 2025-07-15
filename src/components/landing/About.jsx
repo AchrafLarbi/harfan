@@ -7,7 +7,10 @@ export default function About() {
       <div className="max-w-7xl mx-auto ">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="order-1 lg:order-1 pr-5" data-aos="fade-right">
-            <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8" data-aos="fade-down">
+            <div
+              className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8"
+              data-aos="fade-down"
+            >
               <svg
                 width="17"
                 height="17"
@@ -50,7 +53,7 @@ export default function About() {
                       fill="#333333"
                     />
                   </svg>
-                  <span className="font-bold underline decoration-secondary decoration-4 relative ">
+                  <span className="font-bold underline decoration-secondary decoration-6 relative ">
                     تعليمية
                   </span>
                 </div>
@@ -59,7 +62,11 @@ export default function About() {
                 إسلامية متطورة{" "}
               </h2>
             </div>
-            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 leading-relaxed mb-8" data-aos="fade-up" data-aos-delay="200">
+            <p
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 leading-relaxed mb-8"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
               حرفان منصة تعليمية تفاعلية تجمع بين تعلم اللغة العربية وحفظ القرآن
               الكريم بأسلوب مبسط شيق ومتدرج بحيث تركز على التعليم بالتكنولوجيا
               والأنشطة التفاعلية أين يجد المتعلم نفسه في قضاء بيئة تعليمية عليا
@@ -67,7 +74,11 @@ export default function About() {
               لا يكتفي بشاهدته المحتوى وقراءته فقط بل يشارك فيه.
             </p>
           </div>
-          <div className="order-2 lg:order-2 relative flex justify-center items-center" data-aos="zoom-in" data-aos-delay="300">
+          <div
+            className="order-2 lg:order-2 relative flex justify-center items-center"
+            data-aos="zoom-in"
+            data-aos-delay="300"
+          >
             <div className="relative min-w-[280px] min-h-[320px] sm:min-w-[350px] sm:min-h-[400px] md:min-w-[420px] md:min-h-[450px] lg:min-w-[500px] lg:min-h-[500px]">
               <img
                 src={background}
