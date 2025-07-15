@@ -44,7 +44,6 @@ export default function HeroSection() {
             <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
               <span className="text-[#374151] font-bold">منصة</span>
               <div className="flex flex-col items-center text-primary relative">
-                {/* Keep the decorative SVG as is, or replace with a Heroicon if you want a different look */}
                 <svg
                   className="absolute -top-4 -left-6 w-8 h-7"
                   width="40"

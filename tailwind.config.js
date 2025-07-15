@@ -4,6 +4,7 @@ export const theme = {
   extend: {
     colors: {
       primary: {
+        DEFAULT: "#3D4D9C",
         100: "#3D4D9C",
       },
       secondary: {

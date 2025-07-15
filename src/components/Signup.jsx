@@ -4,7 +4,6 @@ export default function Signup() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <h2 className="text-2xl font-bold mb-4">إنشاء حساب جديد</h2>
-      {/* Signup form goes here */}
       <form className="bg-white p-6 rounded shadow-md w-full max-w-sm">
         <input
           className="w-full mb-3 p-2 border rounded"

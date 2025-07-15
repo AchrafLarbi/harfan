@@ -121,9 +121,7 @@ export default function Features() {
       data-aos="fade-up"
     >
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header Section */}
         <div className="flex flex-col items-center text-center mb-16" data-aos="fade-up">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-6" data-aos="fade-down">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -144,11 +142,9 @@ export default function Features() {
             </span>
           </div>
 
-          {/* Main Title */}
           <h1 className="text-6xl font-bold mb-6 flex items-end justify-center " data-aos="fade-up" data-aos-delay="100">
             <span className="text-[#374151] font-extra ml-4">ما الذي</span>
             <div className="flex flex-col items-center text-primary relative">
-              {/* SVG decoration in top left */}
               <svg
                 className="absolute -top-4 -left-6 w-8 h-7"
                 width="40"
