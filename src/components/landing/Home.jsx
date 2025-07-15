@@ -58,9 +58,9 @@ export default function HeroSection() {
             <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
               <span className="text-gray-800 font-bold">منصة</span>
               <div className="flex flex-col items-center text-primary relative">
-                {/* SVG icon positioned above the text */}
+                {/* SVG decoration in top left */}
                 <svg
-                  className="mt-1 mr-28"
+                  className="absolute -top-4 -left-6 w-8 h-7"
                   width="40"
                   height="34"
                   viewBox="0 0 51 43"
@@ -80,9 +80,7 @@ export default function HeroSection() {
                     fill="#333333"
                   />
                 </svg>
-
-                {/* Text with underline positioned below the SVG */}
-                <span className="font-bold underline decoration-secondary decoration-6 underline-offset-5">
+                <span className="font-bold underline decoration-secondary decoration-6 underline-offset-5 relative">
                   حرفان
                 </span>
               </div>

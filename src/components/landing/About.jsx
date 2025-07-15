@@ -34,14 +34,14 @@ export default function About() {
               <h1 className="text-6xl  font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
                 <span className="text-gray-800 font-bold">منصة</span>
                 <div className="flex flex-col items-start text-primary relative">
-                  {/* SVG icon positioned above the text */}
+                  {/* SVG decoration in top left */}
                   <svg
+                    className="absolute -top-4 -left-6 w-8 h-7"
                     width="30"
                     height="25"
                     viewBox="0 0 51 43"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-6 h-5 sm:w-8 sm:h-7 md:w-10 md:h-8 lg:w-10 lg:h-9 mt-1 mr-16 sm:mr-20 md:mr-24 lg:mr-36"
                   >
                     <path
                       d="M24.8212 21.6974C24.5925 21.506 24.3978 21.363 24.228 21.1953C22.5079 19.507 21.2761 17.5742 20.2323 15.5562C20.1109 15.3194 20.0231 15.0561 20.015 14.8085C20.0102 14.6749 20.1566 14.4873 20.3063 14.4137C20.42 14.3592 20.6791 14.41 20.7888 14.4909C21.0002 14.6423 21.1914 14.8334 21.3354 15.038C22.289 16.3856 23.2338 17.7351 24.1666 19.0909C24.5139 19.5988 24.846 20.1177 25.1813 20.632C25.296 20.8029 25.3987 20.9801 25.487 21.1562C25.5911 21.3529 25.5843 21.568 25.3546 21.6695C25.2025 21.7356 25.0663 21.8223 24.8212 21.6974Z"
@@ -56,9 +56,7 @@ export default function About() {
                       fill="#333333"
                     />
                   </svg>
-
-                  {/* Text with underline positioned below the SVG */}
-                  <span className="font-bold underline decoration-secondary decoration-4 ">
+                  <span className="font-bold underline decoration-secondary decoration-4 relative ">
                     تعليمية
                   </span>
                 </div>

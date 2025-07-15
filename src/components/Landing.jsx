@@ -3,6 +3,8 @@ import Navbar from "./Navbar";
 import Home from "../components/landing/Home";
 import About from "../components/landing/About";
 import Features from "../components/landing/Features";
+import Plans from "../components/landing/Plans";
+import Footer from "../components/landing/Footer";
 import landingBg from "../assets/Landing Page.png";
 
 export default function Landing() {
@@ -18,7 +20,9 @@ export default function Landing() {
         <Home />
         <About />
         <Features />
+        <Plans />
       </div>
+      <Footer />
     </div>
   );
 }

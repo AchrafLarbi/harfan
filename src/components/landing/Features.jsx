@@ -147,9 +147,9 @@ export default function Features() {
           <h1 className="text-6xl font-bold mb-6 flex items-end justify-center ">
             <span className="text-[#374151] font-extra">ما الذي</span>
             <div className="flex flex-col items-center text-primary relative">
-              {/* SVG icon positioned above the text */}
+              {/* SVG decoration in top left */}
               <svg
-                className="mt-1 mr-20"
+                className="absolute -top-4 -left-6 w-8 h-7"
                 width="40"
                 height="34"
                 viewBox="0 0 51 43"
@@ -169,9 +169,7 @@ export default function Features() {
                   fill="#333333"
                 />
               </svg>
-
-              {/* Text with underline positioned below the SVG */}
-              <span className="font-extrabold text-6xl underline decoration-secondary decoration-6 underline-offset-5">
+              <span className="font-extrabold text-6xl underline decoration-secondary decoration-6 underline-offset-5 relative">
                 يميز
               </span>
             </div>
