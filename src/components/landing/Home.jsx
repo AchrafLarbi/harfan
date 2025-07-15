@@ -1,3 +1,5 @@
+import { BookmarkIcon, BookOpenIcon, Bars3Icon } from '@heroicons/react/24/outline';
+
 export default function HeroSection() {
   const statisticsData = [
     {
@@ -32,21 +34,7 @@ export default function HeroSection() {
       <div className="max-w-6xl mx-auto px-6 p-10">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-12" data-aos="fade-down">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-bookmark-icon lucide-bookmark"
-              className="text-primary"
-            >
-              <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-            </svg>
+            <BookmarkIcon className="w-5 h-5 text-primary" />
             <span className="text-primary font-medium text-sm">
               منصة تعليمية إسلامية متطورة
             </span>
@@ -56,6 +44,7 @@ export default function HeroSection() {
             <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
               <span className="text-[#374151] font-bold">منصة</span>
               <div className="flex flex-col items-center text-primary relative">
+                {/* Keep the decorative SVG as is, or replace with a Heroicon if you want a different look */}
                 <svg
                   className="absolute -top-4 -left-6 w-8 h-7"
                   width="40"
@@ -96,35 +85,11 @@ export default function HeroSection() {
 
           <div className="flex gap-4 justify-center items-center mb-20" data-aos="zoom-in" data-aos-delay="300">
             <button className="bg-primary text-white font-medium px-6 py-3 rounded-full flex items-center gap-2">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
+              <BookOpenIcon className="w-5 h-5" />
               ابدأ رحلتك التعليمية
             </button>
             <button className="border-2 border-primary text-primary font-medium px-6 py-3 rounded-full flex items-center gap-2">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                />
-              </svg>
+              <Bars3Icon className="w-5 h-5" />
               تصفح الخطط و الاسعار
             </button>
           </div>
