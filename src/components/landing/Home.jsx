@@ -26,7 +26,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="min-h-screen"
+      className="py-10"
       dir="rtl"
     >
       <div className="max-w-6xl mx-auto px-6 p-10">

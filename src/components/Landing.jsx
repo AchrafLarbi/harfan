@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import Home from "../components/landing/Home";
 import About from "../components/landing/About";
 import Features from "../components/landing/Features";
-import landingBg from "../assets/LandingPage.png";
+import landingBg from "../assets/Landing Page.png";
 
 export default function Landing() {
   return (
