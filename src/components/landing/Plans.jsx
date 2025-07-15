@@ -28,7 +28,7 @@ export default function Plans() {
           {/* Main Title */}
           <h1 className="text-6xl font-bold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="flex items-end justify-center gap-4">
-              <span className="text-gray-800 font-bold">اختر</span>
+              <span className="text-[#374151] font-bold">اختر</span>
               <div className="flex flex-col items-center text-primary relative">
                 {/* SVG decoration in top left */}
                 <svg
@@ -58,11 +58,11 @@ export default function Plans() {
               </div>
             </span>
             {/* New line for the rest of the title */}
-            <span className="text-gray-800 font-bold mt-2">المناسبة لك</span>
+            <span className="text-[#374151] font-bold mt-2">المناسبة لك</span>
           </h1>
 
           {/* Description */}
-          <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+          <p className="text-xl text-[#374151] max-w-2xl mx-auto">
             خطط مرنة ومناسبة لجميع الاحتياجات مع ضمان أفضل قيمة مقابل المال.
           </p>
         </div>
@@ -71,36 +71,52 @@ export default function Plans() {
         <h3 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-700">الباقة العادية</h3>
         <div className="flex flex-col md:flex-row gap-8 justify-center mb-16">
           {/* جماعي */}
-          <div className="flex-1 bg-white rounded-3xl border-2 border-green-200 shadow-md p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-green-100 text-green-600 text-xs font-bold px-4 py-1 rounded-full">جماعي</span>
+          <div className="flex-1 bg-[#E8F8ED] border-2 border-green-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl relative">
+            {/* Badge */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#CFF6DD] text-green-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              جماعي
             </div>
-            <h4 className="text-xl font-bold text-gray-800 mb-2">اشتراك شهري جماعي</h4>
-            <div className="text-3xl font-bold text-green-600 mb-4">$49 <span className="text-base font-medium text-gray-500">/ شهر</span></div>
-            <ul className="text-gray-600 space-y-2 mb-6 text-right">
-              <li>دروس محدودة</li>
-              <li>جلسات جماعية أساسية</li>
-              <li>اختبارات أساسية</li>
-              <li>خطة التعليم البسيط</li>
-              <li>كل الأعمار</li>
+            <h4 className="text-2xl font-bold text-gray-800 mt-8 mb-2 text-center">اشتراك شهري جماعي</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-gray-400 text-xl">/ شهر</span>
+              <span className="text-green-600 text-3xl font-bold">$49</span>
+            </div>
+            <ul className="text-gray-600 space-y-3 mb-8 text-right text-lg">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دروس محدودة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>جلسات مباشرة أساسية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>شهادات أساسية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>تتبع التقدم البسيط</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>حق 5 أعضاء</li>
             </ul>
-            <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-full transition-all">اشترك الآن</button>
+            <button className="w-full bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 text-lg transition-all shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              اشترك الان
+            </button>
           </div>
           {/* فردي */}
-          <div className="flex-1 bg-white rounded-3xl border-2 border-blue-200 shadow-md p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-blue-100 text-blue-600 text-xs font-bold px-4 py-1 rounded-full">فردي</span>
+          <div className="flex-1 bg-white border-2 border-blue-200 rounded-3xl shadow-lg p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl relative">
+            {/* Badge */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#E3F0FF] text-blue-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5.121 17.804A13.937 13.937 0 0 1 1 12c0-3.042 1.135-5.824 3-7.938M8.465 3.104A13.937 13.937 0 0 1 12 1c3.042 0 5.824 1.135 7.938 3M20.896 8.465A13.937 13.937 0 0 1 23 12c0 3.042-1.135 5.824-3 7.938M15.535 20.896A13.937 13.937 0 0 1 12 23c-3.042 0-5.824-1.135-7.938-3"/><circle cx="12" cy="12" r="3"/></svg>
+              فردي
             </div>
-            <h4 className="text-xl font-bold text-gray-800 mb-2">اشتراك شهري فردي</h4>
-            <div className="text-3xl font-bold text-blue-600 mb-4">$29 <span className="text-base font-medium text-gray-500">/ شهر</span></div>
-            <ul className="text-gray-600 space-y-2 mb-6 text-right">
-              <li>دروس محدودة</li>
-              <li>جلسات مباشرة أساسية</li>
-              <li>اختبارات أساسية</li>
-              <li>خطة التعليم البسيط</li>
-              <li>كل الأعمار</li>
+            <h4 className="text-2xl font-bold text-gray-800 mt-8 mb-2 text-center">اشتراك شهري فردي</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-gray-400 text-xl">/ شهر</span>
+              <span className="text-blue-600 text-3xl font-bold">$29</span>
+            </div>
+            <ul className="text-gray-600 space-y-3 mb-8 text-right text-lg">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دروس محدودة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>جلسات مباشرة أساسية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دعم عام</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>شهادات أساسية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>تتبع التقدم البسيط</li>
             </ul>
-            <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-full transition-all">اشترك الآن</button>
+            <button className="w-full bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 text-lg transition-all shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              اشترك الان
+            </button>
           </div>
         </div>
 
@@ -108,52 +124,73 @@ export default function Plans() {
         <h3 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-700">الباقة الخاصة</h3>
         <div className="flex flex-col lg:flex-row gap-8 justify-center">
           {/* سنوي */}
-          <div className="flex-1 bg-white rounded-3xl border-2 border-pink-200 shadow-md p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-pink-100 text-pink-600 text-xs font-bold px-4 py-1 rounded-full">سنوي</span>
+          <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative">
+            {/* Badge */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
+              سنوي
             </div>
-            <h4 className="text-xl font-bold text-gray-800 mb-2">اشتراك سنوي</h4>
-            <div className="text-3xl font-bold text-pink-600 mb-4">$199 <span className="text-base font-medium text-gray-500">/ سنة</span></div>
-            <ul className="text-gray-600 space-y-2 mb-6 text-right">
-              <li>دروس غير محدودة</li>
-              <li>جلسات VIP عالية</li>
-              <li>اختبارات عالية</li>
-              <li>خطة تعليم متقدمة</li>
-              <li>مكافآت مخصصة</li>
+            <h4 className="text-2xl font-bold text-gray-800 mt-8 mb-2 text-center">اشتراك سنوي</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-gray-400 text-xl">/ سنة</span>
+              <span className="text-pink-600 text-3xl font-bold">$199</span>
+            </div>
+            <ul className="text-gray-600 space-y-3 mb-8 text-right text-lg">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دروس غير محدودة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>جلسات VIP مباشرة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دعم أولوية عالية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>استشارات شخصية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>شهادات معتمدة</li>
             </ul>
-            <button className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-full transition-all">اشترك الآن</button>
+            <button className="w-full bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 text-lg transition-all shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              اشترك الان
+            </button>
           </div>
           {/* 6 أشهر */}
-          <div className="flex-1 bg-white rounded-3xl border-2 border-pink-200 shadow-md p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-pink-100 text-pink-600 text-xs font-bold px-4 py-1 rounded-full">6 أشهر</span>
+          <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative">
+            {/* Badge */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
+              6 أشهر
             </div>
-            <h4 className="text-xl font-bold text-gray-800 mb-2">اشتراك ستة أشهر</h4>
-            <div className="text-3xl font-bold text-pink-600 mb-4">$119 <span className="text-base font-medium text-gray-500">/ 6 أشهر</span></div>
-            <ul className="text-gray-600 space-y-2 mb-6 text-right">
-              <li>دروس غير محدودة</li>
-              <li>جلسات VIP عالية</li>
-              <li>اختبارات عالية</li>
-              <li>خطة تعليم متقدمة</li>
-              <li>مكافآت مخصصة</li>
+            <h4 className="text-2xl font-bold text-gray-800 mt-8 mb-2 text-center">اشتراك ستة أشهر</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-gray-400 text-xl">/ 6 أشهر</span>
+              <span className="text-pink-600 text-3xl font-bold">$119</span>
+            </div>
+            <ul className="text-gray-600 space-y-3 mb-8 text-right text-lg">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دروس غير محدودة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>جلسات VIP مباشرة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دعم أولوية عالية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>استشارات شخصية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>شهادات معتمدة</li>
             </ul>
-            <button className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-full transition-all">اشترك الآن</button>
+            <button className="w-full bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 text-lg transition-all shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              اشترك الان
+            </button>
           </div>
           {/* 3 أشهر */}
-          <div className="flex-1 bg-white rounded-3xl border-2 border-pink-200 shadow-md p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-pink-100 text-pink-600 text-xs font-bold px-4 py-1 rounded-full">3 أشهر</span>
+          <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative">
+            {/* Badge */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
+              3 أشهر
             </div>
-            <h4 className="text-xl font-bold text-gray-800 mb-2">اشتراك ثلاثة أشهر</h4>
-            <div className="text-3xl font-bold text-pink-600 mb-4">$68 <span className="text-base font-medium text-gray-500">/ 3 أشهر</span></div>
-            <ul className="text-gray-600 space-y-2 mb-6 text-right">
-              <li>دروس غير محدودة</li>
-              <li>جلسات VIP عالية</li>
-              <li>اختبارات عالية</li>
-              <li>خطة تعليم متقدمة</li>
-              <li>مكافآت مخصصة</li>
+            <h4 className="text-2xl font-bold text-gray-800 mt-8 mb-2 text-center">اشتراك ثلاثة أشهر</h4>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-gray-400 text-xl">/ 3 أشهر</span>
+              <span className="text-pink-600 text-3xl font-bold">$68</span>
+            </div>
+            <ul className="text-gray-600 space-y-3 mb-8 text-right text-lg">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دروس غير محدودة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>جلسات VIP مباشرة</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>دعم أولوية عالية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>استشارات شخصية</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>شهادات معتمدة</li>
             </ul>
-            <button className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-full transition-all">اشترك الآن</button>
+            <button className="w-full bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-bold py-3 rounded-full flex items-center justify-center gap-2 text-lg transition-all shadow-md">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              اشترك الان
+            </button>
           </div>
         </div>
       </div>

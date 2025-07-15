@@ -56,7 +56,7 @@ export default function HeroSection() {
           {/* Main Heading */}
           <div className="mb-8">
             <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
-              <span className="text-gray-800 font-bold">منصة</span>
+              <span className="text-[#374151] font-bold">منصة</span>
               <div className="flex flex-col items-center text-primary relative">
                 {/* SVG decoration in top left */}
                 <svg
@@ -85,7 +85,7 @@ export default function HeroSection() {
                 </span>
               </div>
             </h1>
-            <h2 className="text-5xl font-bold text-[#374151]">
+            <h2 className="text-6xl text-[#374151] font-bold">
               لتعلم العربية و القرآن الكريم
             </h2>
           </div>

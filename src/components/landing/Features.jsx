@@ -145,7 +145,7 @@ export default function Features() {
 
           {/* Main Title */}
           <h1 className="text-6xl font-bold mb-6 flex items-end justify-center ">
-            <span className="text-[#374151] font-extra">ما الذي</span>
+            <span className="text-[#374151] font-extra ml-4">ما الذي</span>
             <div className="flex flex-col items-center text-primary relative">
               {/* SVG decoration in top left */}
               <svg

@@ -32,7 +32,7 @@ export default function About() {
             {/* Main heading */}
             <div className="mb-6">
               <h1 className="text-6xl  font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
-                <span className="text-gray-800 font-bold">منصة</span>
+                <span className="text-[#374151] font-bold">منصة</span>
                 <div className="flex flex-col items-start text-primary relative">
                   {/* SVG decoration in top left */}
                   <svg
