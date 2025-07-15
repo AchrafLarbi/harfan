@@ -3,13 +3,13 @@ import background from "../../assets/landing/background.png";
 
 export default function About() {
   return (
-    <section id="about" className="py-20" dir="rtl">
+    <section id="about" className="py-20" dir="rtl" data-aos="fade-up">
       <div className="max-w-7xl mx-auto ">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Right side - Content - Shows first on mobile */}
-          <div className="order-1 lg:order-1 pr-5">
+          <div className="order-1 lg:order-1 pr-5" data-aos="fade-right">
             {/* Top badge */}
-            <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8">
+            <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8" data-aos="fade-down">
               <svg
                 width="17"
                 height="17"
@@ -30,7 +30,7 @@ export default function About() {
             </div>
 
             {/* Main heading */}
-            <div className="mb-6">
+            <div className="mb-6" data-aos="fade-up" data-aos-delay="100">
               <h1 className="text-6xl  font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
                 <span className="text-[#374151] font-bold">منصة</span>
                 <div className="flex flex-col items-start text-primary relative">
@@ -67,7 +67,7 @@ export default function About() {
             </div>
 
             {/* Description */}
-            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 leading-relaxed mb-8">
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 leading-relaxed mb-8" data-aos="fade-up" data-aos-delay="200">
               حرفان منصة تعليمية تفاعلية تجمع بين تعلم اللغة العربية وحفظ القرآن
               الكريم بأسلوب مبسط شيق ومتدرج بحيث تركز على التعليم بالتكنولوجيا
               والأنشطة التفاعلية أين يجد المتعلم نفسه في قضاء بيئة تعليمية عليا
@@ -79,7 +79,7 @@ export default function About() {
           </div>
 
           {/* Left side - Image - Shows second on mobile */}
-          <div className="order-2 lg:order-2 relative flex justify-center items-center">
+          <div className="order-2 lg:order-2 relative flex justify-center items-center" data-aos="zoom-in" data-aos-delay="300">
             {/* Container with same positioning for background and kid image */}
             <div className="relative min-w-[280px] min-h-[320px] sm:min-w-[350px] sm:min-h-[400px] md:min-w-[420px] md:min-h-[450px] lg:min-w-[500px] lg:min-h-[500px]">
               {/* Background image */}

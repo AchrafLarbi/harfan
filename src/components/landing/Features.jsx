@@ -118,12 +118,13 @@ export default function Features() {
       id="features"
       className="py-20"
       dir="rtl"
+      data-aos="fade-up"
     >
       <div className="max-w-7xl mx-auto px-6">
         {/* Header Section */}
-        <div className="flex flex-col items-center text-center mb-16">
+        <div className="flex flex-col items-center text-center mb-16" data-aos="fade-up">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-6" data-aos="fade-down">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -144,7 +145,7 @@ export default function Features() {
           </div>
 
           {/* Main Title */}
-          <h1 className="text-6xl font-bold mb-6 flex items-end justify-center ">
+          <h1 className="text-6xl font-bold mb-6 flex items-end justify-center " data-aos="fade-up" data-aos-delay="100">
             <span className="text-[#374151] font-extra ml-4">ما الذي</span>
             <div className="flex flex-col items-center text-primary relative">
               {/* SVG decoration in top left */}
@@ -174,10 +175,10 @@ export default function Features() {
               </span>
             </div>
           </h1>
-          <h2 className="text-6xl font-bold text-[#374151]">منصة حرفان </h2>
+          <h2 className="text-6xl font-bold text-[#374151]" data-aos="fade-up" data-aos-delay="150">منصة حرفان </h2>
 
           {/* Description */}
-          <p className="text-xl sm:text-2xl mt-5 text-gray-600 leading-relaxed max-w-4xl">
+          <p className="text-xl sm:text-2xl mt-5 text-gray-600 leading-relaxed max-w-4xl" data-aos="fade-up" data-aos-delay="200">
             مميزات فريدة وتقنيات متطورة تجعل تعلم العربية والقرآن الكريم أكثر
             متعة وفعالية.
           </p>
@@ -185,10 +186,12 @@ export default function Features() {
 
         {/* Features Grid */}
         <div className="grid   grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuresData.map((feature) => (
+          {featuresData.map((feature, i) => (
             <div
               key={feature.id}
               className="bg-white rounded-3xl p-10 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-xl group"
+              data-aos="zoom-in"
+              data-aos-delay={300 + i * 100}
             >
               {/* Icon */}
               <div
