@@ -1,219 +1,85 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import logo from "../assets/logo/logo.png";
+import { MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import logo from '../assets/logo/logo.png';
+import { useState } from 'react';
 
-// Simple Menu and X icons as SVG components
-const MenuIcon = () => (
-  <svg
-    className="h-6 w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 6h16M4 12h16M4 18h16"
-    />
-  </svg>
-);
+const navigationItems = [
+  { label: 'الرئيسية', href: '#home', id: 'home' },
+  { label: 'من نحن', href: '#about', id: 'about' },
+  { label: 'المميزات', href: '#features', id: 'features' },
+  { label: 'الخطط', href: '#plans', id: 'plans' },
+  { label: 'تواصل معنا', href: '#contact', id: 'contact' },
+  { label: 'تسجيل الدخول', href: '/login', id: 'login' },
+];
 
-const XIcon = () => (
-  <svg
-    className="h-6 w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
-    />
-  </svg>
-);
-
-export default function ArabicNavbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const navigationItems = [
-    { label: "الرئيسية", href: "#home", id: "home" },
-    { label: "من نحن", href: "#about", id: "about" },
-    { label: "المميزات", href: "#features", id: "features" },
-    { label: "الخطط", href: "#plans", id: "plans" },
-    { label: "تواصل معنا", href: "#contact", id: "contact" },
-    { label: "تسجيل الدخول", href: "/login", id: "login" }, // keep login as a route
-  ];
-
-  // Function to detect active section and scroll state
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-
-      // Update scroll state for navbar styling
-      setIsScrolled(scrollPosition > 10);
-
-      // Update active section
-      const sections = navigationItems.filter((item) => item.id !== "login");
-      const offsetScrollPosition = scrollPosition + 100; // Add offset for better detection
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = document.getElementById(sections[i].id);
-        if (section) {
-          const sectionTop = section.offsetTop;
-          if (offsetScrollPosition >= sectionTop) {
-            setActiveSection(sections[i].id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Call once to set initial active section
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleNavClick = (href) => {
-    if (href.startsWith("#")) {
-      const section = document.querySelector(href);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      window.location.href = href;
-    }
-    setIsMenuOpen(false);
-  };
+export default function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav
-      className={`text-gray-800 border-b border-gray-200 fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "shadow-lg backdrop-blur-lg bg-white/40"
-          : "shadow-none  backdrop-blur-none"
-      }`}
-      dir="rtl"
-    >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Mobile menu button */}
-          <div className="lg:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-800 hover:text-gray-600 focus:outline-none focus:text-gray-300 transition-colors duration-200"
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <XIcon /> : <MenuIcon />}
-            </button>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex lg:items-center lg:justify-between lg:w-full lg:px-8">
-            <div className="flex items-center justify-between w-full font-bold space-x-6 space-x-reverse">
-              {/* Navigation items before logo */}
-              {navigationItems.slice(0, 3).map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  className={`text-base font-semibold transition-colors duration-200 hover:text-primary cursor-pointer relative ${
-                    activeSection === item.id ? "text-primary" : "text-gray-700"
-                  }`}
-                >
-                  {item.label}
-                  {activeSection === item.id && (
-                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
-                  )}
-                </a>
-              ))}
-
-              {/* Logo as navigation item */}
-              <a
-                href="/"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick("/");
-                }}
-                className="flex-shrink-0 transition-transform duration-200 hover:scale-105 "
-              >
-                <img src={logo} className="w-16 h-16 object-contain" />
-              </a>
-
-              {/* Navigation items after logo */}
-              {navigationItems.slice(3).map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  className={`text-base font-semibold transition-colors duration-200 hover:text-primary cursor-pointer relative ${
-                    activeSection === item.id ? "text-primary" : "text-gray-700"
-                  }`}
-                >
-                  {item.label}
-                  {activeSection === item.id && item.id !== "login" && (
-                    <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"></div>
-                  )}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex-shrink-0">
-            <a
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick("/");
-              }}
-              className="flex-shrink-0 transition-transform duration-200 hover:scale-105 "
-            >
-              <img src={logo} className="w-12 h-12 object-contain" />
-            </a>
-          </div>
-
-          {/* Mobile placeholder for balance */}
-          <div className="lg:hidden w-6"></div>
+    <div className="w-full max-w-7xl mx-auto px-4 font-sans" dir="rtl">
+      <div className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-gray-100 flex-row-reverse">
+        {/* Menu button on the right for RTL */}
+        <button
+          className="lg:hidden p-2 focus:outline-none rounded-full hover:bg-[#3D4D9C]/10 focus:bg-[#3D4D9C]/20 transition"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Open menu"
+        >
+          {isMobileMenuOpen ? (
+            <XMarkIcon className="w-6 h-6 text-[#3D4D9C]" />
+          ) : (
+            <Bars3Icon className="w-6 h-6 text-[#3D4D9C]" />
+          )}
+        </button>
+        {/* Logo */}
+        <div className="flex items-center">
+          <img src={logo} alt="Logo" className="h-10 w-10 md:h-12 md:w-12 object-contain" />
         </div>
-
-        {/* Mobile Navigation Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border border-gray-200 rounded-lg mt-2 shadow-xl">
-              {navigationItems.map((item) => (
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex flex-1 justify-center">
+          <ul className="flex space-x-8 space-x-reverse text-gray-700 font-medium">
+            {navigationItems.map((item, idx) => (
+              <li key={item.id}>
                 <a
-                  key={item.id}
                   href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.href);
-                  }}
-                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 hover:text-primary cursor-pointer relative ${
-                    activeSection === item.id
-                      ? "text-primary bg-secondary underline decoration-primary"
-                      : "text-gray-700"
-                  }`}
+                  className={
+                    idx === 0
+                      ? 'text-[#3D4D9C] font-semibold'
+                      : 'hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl transition px-3 py-2 cursor-pointer'
+                  }
+                  tabIndex={0}
                 >
                   {item.label}
                 </a>
-              ))}
-            </div>
-          </div>
-        )}
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
-    </nav>
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white border border-gray-200 rounded-2xl mx-2 mt-2 px-4 py-4 shadow-xl animate-fade-in">
+          <nav className="mb-2">
+            <ul className="space-y-3 text-gray-700 font-medium">
+              {navigationItems.map((item, idx) => (
+                <li key={item.id}>
+                  <a
+                    href={item.href}
+                    className={
+                      idx === 0
+                        ? 'block text-[#3D4D9C] font-semibold'
+                        : 'block hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl transition px-3 py-2 cursor-pointer'
+                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    tabIndex={0}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
+    </div>
   );
 }
