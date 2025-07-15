@@ -1,5 +1,4 @@
 export default function HeroSection() {
-  // Statistics data in JSON format
   const statisticsData = [
     {
       id: 1,
@@ -32,7 +31,6 @@ export default function HeroSection() {
     >
       <div className="max-w-6xl mx-auto px-6 p-10">
         <div className="text-center">
-          {/* Top Badge */}
           <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-12" data-aos="fade-down">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -54,12 +52,10 @@ export default function HeroSection() {
             </span>
           </div>
 
-          {/* Main Heading */}
           <div className="mb-8" data-aos="fade-up" data-aos-delay="100">
             <h1 className="text-6xl font-bold mb-6 flex items-end justify-center gap-4">
               <span className="text-[#374151] font-bold">منصة</span>
               <div className="flex flex-col items-center text-primary relative">
-                {/* SVG decoration in top left */}
                 <svg
                   className="absolute -top-4 -left-6 w-8 h-7"
                   width="40"
@@ -91,7 +87,6 @@ export default function HeroSection() {
             </h2>
           </div>
 
-          {/* Description */}
           <p className="text-xl text-gray-500 max-w-3xl mx-auto mb-12 leading-relaxed " data-aos="fade-up" data-aos-delay="200">
             تعليم مبسط وتفاعلي، أنشطة حية ومحفزة، تواصل مباشر مع المعلمين، وتطور
             مستمر
@@ -99,7 +94,6 @@ export default function HeroSection() {
             في بيئة إسلامية آمنة.
           </p>
 
-          {/* CTA Buttons */}
           <div className="flex gap-4 justify-center items-center mb-20" data-aos="zoom-in" data-aos-delay="300">
             <button className="bg-primary text-white font-medium px-6 py-3 rounded-full flex items-center gap-2">
               <svg
@@ -135,7 +129,6 @@ export default function HeroSection() {
             </button>
           </div>
 
-          {/* Statistics */}
           <div className="grid grid-cols-4 gap-8 max-w-4xl mx-auto">
             {statisticsData.map((stat, i) => (
               <div key={stat.id} className="text-center" data-aos="fade-up" data-aos-delay={400 + i * 100}>

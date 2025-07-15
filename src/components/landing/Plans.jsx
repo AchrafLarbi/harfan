@@ -4,9 +4,7 @@ export default function Plans() {
   return (
     <section id="plans" className="py-20" dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-12 flex flex-col items-center" data-aos="fade-up">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-8">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -25,12 +23,10 @@ export default function Plans() {
             <span className="text-primary font-medium text-sm">الخطط والأسعار</span>
           </div>
 
-          {/* Main Title */}
           <h1 className="text-6xl font-bold mb-6 flex flex-col items-center justify-center gap-4">
             <span className="flex items-end justify-center gap-4">
               <span className="text-[#374151] font-bold">اختر</span>
               <div className="flex flex-col items-center text-primary relative">
-                {/* SVG decoration in top left */}
                 <svg
                   className="absolute -top-4 -left-6 w-8 h-7"
                   width="40"
@@ -57,22 +53,17 @@ export default function Plans() {
                 </span>
               </div>
             </span>
-            {/* New line for the rest of the title */}
             <span className="text-[#374151] font-bold mt-2">المناسبة لك</span>
           </h1>
 
-          {/* Description */}
           <p className="text-xl text-[#374151] max-w-2xl mx-auto">
             خطط مرنة ومناسبة لجميع الاحتياجات مع ضمان أفضل قيمة مقابل المال.
           </p>
         </div>
 
-        {/* الباقة العادية */}
         <h3 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-700" data-aos="fade-up">الباقة العادية</h3>
         <div className="flex flex-col md:flex-row gap-8 justify-center mb-16">
-          {/* جماعي */}
           <div className="flex-1 bg-[#E8F8ED] border-2 border-green-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl relative" data-aos="zoom-in" data-aos-delay="0">
-            {/* Badge */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#CFF6DD] text-green-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               جماعي
@@ -94,9 +85,7 @@ export default function Plans() {
               اشترك الان
             </button>
           </div>
-          {/* فردي */}
           <div className="flex-1 border-2 border-blue-200 bg-[#EFF4FF] rounded-3xl shadow-lg p-8 max-w-md mx-auto md:mx-0 transition-all hover:scale-105 hover:shadow-xl relative" data-aos="zoom-in" data-aos-delay="150">
-            {/* Badge */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#EFF4FF] text-blue-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5.121 17.804A13.937 13.937 0 0 1 1 12c0-3.042 1.135-5.824 3-7.938M8.465 3.104A13.937 13.937 0 0 1 12 1c3.042 0 5.824 1.135 7.938 3M20.896 8.465A13.937 13.937 0 0 1 23 12c0 3.042-1.135 5.824-3 7.938M15.535 20.896A13.937 13.937 0 0 1 12 23c-3.042 0-5.824-1.135-7.938-3"/><circle cx="12" cy="12" r="3"/></svg>
               فردي
@@ -120,12 +109,9 @@ export default function Plans() {
           </div>
         </div>
 
-        {/* الباقة الخاصة */}
         <h3 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-700" data-aos="fade-up">الباقة الخاصة</h3>
         <div className="flex flex-col lg:flex-row gap-8 justify-center">
-          {/* سنوي */}
           <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative" data-aos="zoom-in" data-aos-delay="0">
-            {/* Badge */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
               سنوي
             </div>
@@ -146,9 +132,7 @@ export default function Plans() {
               اشترك الان
             </button>
           </div>
-          {/* 6 أشهر */}
           <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative" data-aos="zoom-in" data-aos-delay="150">
-            {/* Badge */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
               6 أشهر
             </div>
@@ -169,9 +153,7 @@ export default function Plans() {
               اشترك الان
             </button>
           </div>
-          {/* 3 أشهر */}
           <div className="flex-1 bg-[#FFF3F8] border-2 border-pink-300 rounded-3xl shadow-lg p-8 max-w-md mx-auto lg:mx-0 transition-all hover:scale-105 hover:shadow-xl relative" data-aos="zoom-in" data-aos-delay="300">
-            {/* Badge */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FAD1E8] text-pink-700 font-bold text-md px-8 py-2 rounded-full flex items-center gap-2 shadow-md">
               3 أشهر
             </div>

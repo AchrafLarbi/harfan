@@ -6,9 +6,7 @@ export default function About() {
     <section id="about" className="py-20" dir="rtl" data-aos="fade-up">
       <div className="max-w-7xl mx-auto ">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Right side - Content - Shows first on mobile */}
           <div className="order-1 lg:order-1 pr-5" data-aos="fade-right">
-            {/* Top badge */}
             <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-4 py-2 mb-8" data-aos="fade-down">
               <svg
                 width="17"
@@ -25,16 +23,12 @@ export default function About() {
                   stroke-linejoin="round"
                 />
               </svg>
-
               <span className="text-primary font-medium text-sm">من نحن ؟</span>
             </div>
-
-            {/* Main heading */}
             <div className="mb-6" data-aos="fade-up" data-aos-delay="100">
               <h1 className="text-6xl  font-bold  sm:mb-6 flex items-end justify-start gap-2 sm:gap-4">
                 <span className="text-[#374151] font-bold">منصة</span>
                 <div className="flex flex-col items-start text-primary relative">
-                  {/* SVG decoration in top left */}
                   <svg
                     className="absolute -top-4 -left-6 w-8 h-7"
                     width="30"
@@ -65,8 +59,6 @@ export default function About() {
                 إسلامية متطورة{" "}
               </h2>
             </div>
-
-            {/* Description */}
             <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 leading-relaxed mb-8" data-aos="fade-up" data-aos-delay="200">
               حرفان منصة تعليمية تفاعلية تجمع بين تعلم اللغة العربية وحفظ القرآن
               الكريم بأسلوب مبسط شيق ومتدرج بحيث تركز على التعليم بالتكنولوجيا
@@ -74,29 +66,19 @@ export default function About() {
               القيم الأصدق ويزيد من ثقته واحترامه مقارنة بالطرق التقليدية أي أنه
               لا يكتفي بشاهدته المحتوى وقراءته فقط بل يشارك فيه.
             </p>
-
-            {/* Statistics section */}
           </div>
-
-          {/* Left side - Image - Shows second on mobile */}
           <div className="order-2 lg:order-2 relative flex justify-center items-center" data-aos="zoom-in" data-aos-delay="300">
-            {/* Container with same positioning for background and kid image */}
             <div className="relative min-w-[280px] min-h-[320px] sm:min-w-[350px] sm:min-h-[400px] md:min-w-[420px] md:min-h-[450px] lg:min-w-[500px] lg:min-h-[500px]">
-              {/* Background image */}
               <img
                 src={background}
                 alt="Background shape"
                 className="absolute inset-0 w-full h-full object-cover z-0"
               />
-
-              {/* Kid image - positioned exactly like background */}
               <img
                 src={kidImage}
                 alt="طالب سعيد"
                 className="absolute inset-0 w-full h-full object-contain z-10"
               />
-
-              {/* Top badge */}
               <div className="absolute -top-2 right-1/2 sm:-top-3 sm:right-2/3 md:-top-4 md:right-3/4 lg:-top-4 lg:right-3/4 bg-white rounded-xl sm:rounded-2xl px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6 shadow-lg sm:shadow-xl lg:shadow-2xl z-20">
                 <span className="text-[#524FD5] font-bold text-xs sm:text-sm lg:text-md">
                   +10 دروس
@@ -105,8 +87,6 @@ export default function About() {
                   تعليمية كل يوم
                 </p>
               </div>
-
-              {/* Bottom profile section */}
               <div className="absolute -bottom-2 left-1/2 sm:-bottom-3 sm:left-2/3 md:-bottom-4 md:left-3/4 lg:-bottom-4 lg:left-3/4 transform -translate-x-1/2 bg-white rounded-xl sm:rounded-2xl px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6 shadow-lg z-20">
                 <div className="flex flex-col items-start gap-2 sm:gap-3">
                   <div className="flex -space-x-1">

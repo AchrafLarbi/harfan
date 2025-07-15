@@ -63,7 +63,6 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Mobile menu button */}
           <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -74,10 +73,8 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:justify-between lg:w-full lg:px-8">
             <div className="flex items-center justify-between w-full font-bold space-x-6 space-x-reverse">
-              {/* Navigation items before logo */}
               {navigationItems.slice(0, 3).map((item) => (
                 <a
                   key={item.id}
@@ -98,7 +95,6 @@ export default function Navbar() {
                 </a>
               ))}
 
-              {/* Logo as navigation item */}
               <a
                 href="/"
                 onClick={(e) => {
@@ -110,7 +106,6 @@ export default function Navbar() {
                 <img src={logo} className="w-16 h-16 object-contain" />
               </a>
 
-              {/* Navigation items after logo */}
               {navigationItems.slice(3).map((item) => (
                 <a
                   key={item.id}
@@ -133,7 +128,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Logo */}
           <div className="lg:hidden flex-shrink-0">
             <a
               href="/"
@@ -147,11 +141,9 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile placeholder for balance */}
           <div className="lg:hidden w-6"></div>
         </div>
 
-        {/* Mobile Navigation Menu */}
         {isMenuOpen && (
           <div className="lg:hidden bg-white border border-gray-200 rounded-2xl mx-2 mt-2 px-4 py-4 shadow-xl animate-fade-in">
             <nav className="mb-2">
