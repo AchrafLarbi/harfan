@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row md:justify-between gap-10 md:gap-0 border-b border-[#23273A] pb-8">
           {/* Logo & Description */}
           <div className="flex-1 flex flex-col items-center md:items-end text-center md:text-right gap-4">
-            <img src={logo2} alt="حرفان" className="w-24 h-24 object-contain mb-2" />
+            <img src={logo2} alt="حرفان" className="w-24 h-24 object-contain mb-2 text-right" />
             <p className="text-gray-300 text-sm max-w-xs">
               حرفان منصة تعليمية تفاعلية تجمع بين تعلم اللغة العربية وحفظ القرآن الكريم. الأنسب لمستوى الطفل ومبتكر.
             </p>
