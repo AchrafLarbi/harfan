@@ -44,7 +44,6 @@ export default function Login() {
             اختر نوع حسابك للمتابعة
           </p>
           <div className="flex mb-6 gap-2 rounded-lg p-1 relative overflow-hidden p-6">
-            {/* Animated sliding indicator */}
             <motion.div
               layout
               initial={false}
