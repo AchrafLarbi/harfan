@@ -5,14 +5,65 @@ import {
   FaCheckCircle,
   FaStar,
   FaShieldAlt,
+  FaEnvelope,
+  FaLock,
+  FaUser,
+  FaPhone,
 } from "react-icons/fa";
 import background from "../assets/LandingPage.png";
 import logo2 from "../assets/logo/browserLogo.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Signup() {
   const [role, setRole] = useState("student");
   const [agreed, setAgreed] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    country: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const { signup, isLoading, error, clearAuthError } = useAuth();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearAuthError();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("كلمة المرور وتأكيد كلمة المرور غير متطابقين");
+      return;
+    }
+
+    if (!agreed) {
+      alert("يجب الموافقة على الشروط والأحكام");
+      return;
+    }
+
+    try {
+      await signup({
+        ...formData,
+        role,
+      });
+      console.log("Signup successful!");
+    } catch (err) {
+      console.error("Signup failed:", err);
+    }
+  };
 
   return (
     <div
@@ -78,7 +129,7 @@ export default function Signup() {
           <p className="text-gray-500 text-sm text-center mb-6">
             اختر نوع حسابك للمتابعة
           </p>
-          <div className="flex mb-6 gap-2 rounded-lg p-1 relative overflow-hidden p-6">
+          <div className="flex mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
             {/* Animated sliding indicator */}
             <motion.div
               layout
@@ -97,15 +148,17 @@ export default function Signup() {
             <button
               type="button"
               className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${role === "teacher"
-                  ? "text-primary border-primary shadow"
-                  : "text-gray-400 border-transparent"}
+                ${
+                  role === "teacher"
+                    ? "text-primary border-primary shadow"
+                    : "text-gray-400 border-transparent"
+                }
                 hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("teacher")}
             >
               <motion.span
                 animate={{ scale: role === "teacher" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.10 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex items-center gap-2"
               >
@@ -115,15 +168,17 @@ export default function Signup() {
             <button
               type="button"
               className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${role === "student"
-                  ? "text-primary border-primary shadow"
-                  : "text-gray-400 border-transparent"}
+                ${
+                  role === "student"
+                    ? "text-primary border-primary shadow"
+                    : "text-gray-400 border-transparent"
+                }
                 hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("student")}
             >
               <motion.span
                 animate={{ scale: role === "student" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.10 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex items-center gap-2"
               >
@@ -131,7 +186,12 @@ export default function Signup() {
               </motion.span>
             </button>
           </div>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <AnimatePresence mode="wait">
               {role === "teacher" && (
                 <motion.div
@@ -139,21 +199,55 @@ export default function Signup() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -24 }}
-                  transition={{ duration: 0.22, type: "spring", stiffness: 180, damping: 18 }}
+                  transition={{
+                    duration: 0.22,
+                    type: "spring",
+                    stiffness: 180,
+                    damping: 18,
+                  }}
                   className="space-y-4"
                 >
                   <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-primary/40 rounded-lg p-4 mb-2 bg-primary/5">
                     <label className="flex flex-col items-center cursor-pointer w-full">
                       <span className="text-primary font-bold mb-2 flex items-center gap-2">
-                        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path fill="#6366f1" d="M12 16V4m0 0l-4 4m4-4l4 4"/><path stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4"/><path stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"/></svg>
+                        <svg
+                          width="32"
+                          height="32"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path fill="#6366f1" d="M12 16V4m0 0l-4 4m4-4l4 4" />
+                          <path
+                            stroke="#6366f1"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 16V4m0 0l-4 4m4-4l4 4"
+                          />
+                          <path
+                            stroke="#6366f1"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"
+                          />
+                        </svg>
                         اسحب وأفلت سيرتك الذاتية أو اختر ملفك
                       </span>
-                      <input type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" />
-                      <span className="text-xs text-gray-500 mt-1">Supported formats: PDF, DOC, DOCX, JPG, PNG</span>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        className="hidden"
+                      />
+                      <span className="text-xs text-gray-500 mt-1">
+                        Supported formats: PDF, DOC, DOCX, JPG, PNG
+                      </span>
                     </label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1 text-gray-700">سنوات الخبرة <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">
+                      سنوات الخبرة <span className="text-red-500">*</span>
+                    </label>
                     <input
                       className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                       type="number"
@@ -163,7 +257,9 @@ export default function Signup() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1 text-gray-700">المجال <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">
+                      المجال <span className="text-red-500">*</span>
+                    </label>
                     <input
                       className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                       type="text"
@@ -179,9 +275,13 @@ export default function Signup() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -24 }}
-                  transition={{ duration: 0.22, type: "spring", stiffness: 180, damping: 18 }}
-                >
-                </motion.div>
+                  transition={{
+                    duration: 0.22,
+                    type: "spring",
+                    stiffness: 180,
+                    damping: 18,
+                  }}
+                ></motion.div>
               )}
             </AnimatePresence>
             <div className="grid grid-cols-2 gap-4">
@@ -189,23 +289,35 @@ export default function Signup() {
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   الاسم الأول <span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                  type="text"
-                  placeholder="أحمد"
-                  required
-                />
+                <div className="relative">
+                  <FaUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    type="text"
+                    name="firstName"
+                    placeholder="أحمد"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   اسم العائلة <span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                  type="text"
-                  placeholder="محمد"
-                  required
-                />
+                <div className="relative">
+                  <FaUser className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    type="text"
+                    name="lastName"
+                    placeholder="محمد"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
             </div>
             {/* Student-only phone number field */}
@@ -214,24 +326,36 @@ export default function Signup() {
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   رقم الهاتف <span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                  type="tel"
-                  placeholder="+213 ..."
-                  required
-                />
+                <div className="relative">
+                  <FaPhone className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    type="tel"
+                    name="phone"
+                    placeholder="+213 ..."
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
             )}
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 بريد إلكتروني <span className="text-red-500">*</span>
               </label>
-              <input
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                type="email"
-                placeholder="me@email.com"
-                required
-              />
+              <div className="relative">
+                <FaEnvelope className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                  type="email"
+                  name="email"
+                  placeholder="me@email.com"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -248,14 +372,20 @@ export default function Signup() {
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   البلد
                 </label>
-                <select className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition">
-                  <option>مصر</option>
-                  <option>السعودية</option>
-                  <option>الإمارات</option>
-                  <option>قطر</option>
-                  <option>الكويت</option>
-                  <option>البحرين</option>
-                  <option>عمان</option>
+                <select
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                >
+                  <option value="">اختر البلد</option>
+                  <option value="egypt">مصر</option>
+                  <option value="saudi">السعودية</option>
+                  <option value="uae">الإمارات</option>
+                  <option value="qatar">قطر</option>
+                  <option value="kuwait">الكويت</option>
+                  <option value="bahrain">البحرين</option>
+                  <option value="oman">عمان</option>
                 </select>
               </div>
             </div>
@@ -264,23 +394,49 @@ export default function Signup() {
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   كلمة المرور <span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+                <div className="relative">
+                  <FaLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
                   تأكيد كلمة المرور <span className="text-red-500">*</span>
                 </label>
-                <input
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
+                <div className="relative">
+                  <FaLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex items-start gap-2 text-sm mb-4">
@@ -305,9 +461,17 @@ export default function Signup() {
             </div>
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-lg font-bold mt-2 transition"
+              disabled={isLoading}
+              className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-2 rounded-lg text-lg font-bold mt-2 transition flex items-center justify-center"
             >
-              الانضمام لعائلة حرفان
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                  جاري إنشاء الحساب...
+                </>
+              ) : (
+                "الانضمام لعائلة حرفان"
+              )}
             </button>
           </form>
           <div className="text-center mt-4 text-sm text-gray-700">

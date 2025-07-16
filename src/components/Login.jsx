@@ -11,14 +11,39 @@ import {
 import logo2 from "../assets/logo/browserLogo.png";
 import background from "../assets/Landing Page.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const [role, setRole] = useState("student");
   const [remember, setRemember] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { login, isLoading, error, clearAuthError } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearAuthError();
+
+    try {
+      await login({
+        email,
+        password,
+        role,
+        remember,
+      });
+      // Handle successful login (e.g., redirect)
+      console.log("Login successful!");
+    } catch (err) {
+      console.error("Login failed:", err);
+      // Error is handled by Redux state
+    }
+  };
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center bg-no-repeat flex flex-col min-h-screen px-2 font-cairo relative overflow-hidden"
+      className=" bg-cover bg-center bg-no-repeat flex flex-col min-h-screen px-2 font-cairo relative overflow-hidden"
       dir="rtl"
       style={{ backgroundImage: `url(${background})` }}
     >
@@ -61,15 +86,17 @@ export default function Login() {
             <button
               type="button"
               className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${role === "teacher"
-                  ? "text-primary border-primary shadow"
-                  : "text-gray-400 border-transparent"}
+                ${
+                  role === "teacher"
+                    ? "text-primary border-primary shadow"
+                    : "text-gray-400 border-transparent"
+                }
                 hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("teacher")}
             >
               <motion.span
                 animate={{ scale: role === "teacher" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.10 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex items-center gap-2"
               >
@@ -79,15 +106,17 @@ export default function Login() {
             <button
               type="button"
               className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${role === "student"
-                  ? "text-primary border-primary shadow"
-                  : "text-gray-400 border-transparent"}
+                ${
+                  role === "student"
+                    ? "text-primary border-primary shadow"
+                    : "text-gray-400 border-transparent"
+                }
                 hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("student")}
             >
               <motion.span
                 animate={{ scale: role === "student" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.10 }}
+                whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex items-center gap-2"
               >
@@ -95,28 +124,50 @@ export default function Login() {
               </motion.span>
             </button>
           </div>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 بريد إلكتروني <span className="text-red-500">*</span>
               </label>
-              <input
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                type="email"
-                placeholder="me@email.com"
-                required
-              />
+              <div className="relative">
+                <FaEnvelope className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                  type="email"
+                  placeholder="me@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 كلمة المرور <span className="text-red-500">*</span>
               </label>
-              <input
-                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
-                type="password"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <FaLock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-2">
               <label className="flex items-center gap-1 cursor-pointer">
@@ -134,9 +185,17 @@ export default function Login() {
             </div>
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg text-lg font-bold mt-2 transition"
+              disabled={isLoading}
+              className="w-full bg-primary hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-2 rounded-lg text-lg font-bold mt-2 transition flex items-center justify-center"
             >
-              تسجيل الدخول
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white ml-2"></div>
+                  جاري تسجيل الدخول...
+                </>
+              ) : (
+                "تسجيل الدخول"
+              )}
             </button>
           </form>
         </div>
