@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import logo2 from "../assets/logo/browserLogo.png";
 import background from "../assets/Landing Page.png";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Login() {
   const [role, setRole] = useState("student");
@@ -42,28 +43,57 @@ export default function Login() {
           <p className="text-gray-500 text-sm text-center mb-6">
             اختر نوع حسابك للمتابعة
           </p>
-          <div className="flex mb-6 gap-2 rounded-lg bg-gray-100 p-1">
+          <div className="flex mb-6 gap-2 rounded-lg p-1 relative overflow-hidden p-6">
+            {/* Animated sliding indicator */}
+            <motion.div
+              layout
+              initial={false}
+              animate={{
+                x: role === "teacher" ? 0 : "100%",
+                width: "50%",
+                background: "#fff",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                borderRadius: "0.75rem",
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              className="absolute top-0 left-0 h-full z-0"
+              style={{ willChange: "transform, width" }}
+            />
             <button
               type="button"
-              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border ${
-                role === "teacher"
-                  ? "bg-white text-primary border-primary shadow"
-                  : "bg-gray-100 text-gray-400 border-transparent"
-              }`}
+              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
+                ${role === "teacher"
+                  ? "text-primary border-primary shadow"
+                  : "text-gray-400 border-transparent"}
+                hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("teacher")}
             >
-              <FaChalkboardTeacher /> مدرس
+              <motion.span
+                animate={{ scale: role === "teacher" ? 1.08 : 1 }}
+                whileHover={{ scale: 1.10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex items-center gap-2"
+              >
+                <FaChalkboardTeacher /> مدرس
+              </motion.span>
             </button>
             <button
               type="button"
-              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border ${
-                role === "student"
-                  ? "bg-white text-primary border-primary shadow"
-                  : "bg-gray-100 text-gray-400 border-transparent"
-              }`}
+              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
+                ${role === "student"
+                  ? "text-primary border-primary shadow"
+                  : "text-gray-400 border-transparent"}
+                hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
               onClick={() => setRole("student")}
             >
-              <FaBookOpen /> طالب
+              <motion.span
+                animate={{ scale: role === "student" ? 1.08 : 1 }}
+                whileHover={{ scale: 1.10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex items-center gap-2"
+              >
+                <FaBookOpen /> طالب
+              </motion.span>
             </button>
           </div>
           <form className="space-y-4">
