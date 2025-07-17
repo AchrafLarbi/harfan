@@ -18,8 +18,8 @@ import {
 
 // API Configuration
 const API_CONFIG = {
-  // TODO: Replace with your actual backend URL when ready
-  baseURL: "http://localhost:3001/api", // Will be set from environment variables or config
+  // Django backend URL
+  baseURL: "http://localhost:8000", // Django default port
   version: "v1",
   timeout: 10000,
 };
@@ -30,10 +30,10 @@ const getAuthToken = () => {
   return state.auth.token;
 };
 
-// Helper function to create API URL (will be used when backend is ready)
-// const createApiUrl = (endpoint) => {
-//   return `${API_CONFIG.baseURL}/${API_CONFIG.version}${endpoint}`;
-// };
+// Helper function to create API URL
+const createApiUrl = (endpoint) => {
+  return `${API_CONFIG.baseURL}${endpoint}`;
+};
 
 // Generic API call function
 const apiCall = async (endpoint, options = {}) => {
@@ -43,14 +43,23 @@ const apiCall = async (endpoint, options = {}) => {
     dispatch(apiCallStart());
 
     const token = getAuthToken();
-    // const url = createApiUrl(endpoint); // Will be used when backend is ready
+    const url = createApiUrl(endpoint);
+
+    // Public endpoints that don't require authentication
+    const publicEndpoints = ["/auth/register", "/auth/login", "/verify-email"];
+    const isPublicEndpoint = publicEndpoints.some((publicEndpoint) =>
+      endpoint.startsWith(publicEndpoint)
+    );
 
     const defaultOptions = {
       headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        // Only set Content-Type for non-FormData requests
+        ...(!(options.body instanceof FormData) && {
+          "Content-Type": "application/json",
+        }),
+        // Only add Authorization header for non-public endpoints
+        ...(!isPublicEndpoint && token && { Authorization: `Bearer ${token}` }),
       },
-      timeout: API_CONFIG.timeout,
     };
 
     const mergedOptions = {
@@ -62,16 +71,12 @@ const apiCall = async (endpoint, options = {}) => {
       },
     };
 
-    // TODO: Uncomment when backend is ready
-    // const response = await fetch(url, mergedOptions);
-    // const data = await response.json();
+    const response = await fetch(url, mergedOptions);
+    const data = await response.json();
 
-    // if (!response.ok) {
-    //   throw new Error(data.message || 'API call failed');
-    // }
-
-    // Mock response for now
-    const data = await mockApiResponse(endpoint, mergedOptions);
+    if (!response.ok) {
+      throw new Error(data.detail || data.message || "API call failed");
+    }
 
     dispatch(apiCallSuccess());
     return data;
@@ -79,43 +84,6 @@ const apiCall = async (endpoint, options = {}) => {
     dispatch(apiCallFailure(error.message));
     throw error;
   }
-};
-
-// Mock API responses (remove when backend is ready)
-const mockApiResponse = async (endpoint) => {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Mock responses based on endpoint
-  if (endpoint === "/auth/login") {
-    return {
-      success: true,
-      user: {
-        id: 1,
-        email: "user@example.com",
-        firstName: "أحمد",
-        lastName: "محمد",
-        role: "student",
-      },
-      token: "mock-jwt-token-123",
-    };
-  }
-
-  if (endpoint === "/auth/signup") {
-    return {
-      success: true,
-      user: {
-        id: 2,
-        email: "newuser@example.com",
-        firstName: "فاطمة",
-        lastName: "علي",
-        role: "student",
-      },
-      token: "mock-jwt-token-456",
-    };
-  }
-
-  return { success: true, data: null };
 };
 
 // Authentication API calls
@@ -129,17 +97,46 @@ export const authAPI = {
 
       const response = await apiCall("/auth/login", {
         method: "POST",
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+          role: credentials.role, // Include role for verification
+        }),
       });
 
+      // Verify that the user's role matches the selected role
+      if (response.user?.role !== credentials.role) {
+        throw new Error(
+          `هذا الحساب مخصص لـ ${
+            response.user?.role === "teacher" ? "المعلمين" : "الطلاب"
+          } فقط`
+        );
+      }
+
       // Store token in localStorage
-      localStorage.setItem("harfan_token", response.token);
-      localStorage.setItem("harfan_user", JSON.stringify(response.user));
+      localStorage.setItem("harfan_token", response.access);
+      localStorage.setItem("harfan_refresh_token", response.refresh);
+      localStorage.setItem(
+        "harfan_user",
+        JSON.stringify({
+          id: response.user?.id,
+          email: credentials.email,
+          firstName: response.user?.first_name,
+          lastName: response.user?.last_name,
+          role: response.user?.role,
+        })
+      );
 
       dispatch(
         loginSuccess({
-          user: response.user,
-          token: response.token,
+          user: {
+            id: response.user?.id,
+            email: credentials.email,
+            firstName: response.user?.first_name,
+            lastName: response.user?.last_name,
+            role: response.user?.role,
+          },
+          token: response.access,
         })
       );
 
@@ -157,24 +154,91 @@ export const authAPI = {
     try {
       dispatch(signupStart());
 
-      const response = await apiCall("/auth/signup", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+      // Check if userData is FormData (for file uploads)
+      if (userData instanceof FormData) {
+        console.log("Signup data being sent as FormData" + userData);
 
-      // Store token in localStorage
-      localStorage.setItem("harfan_token", response.token);
-      localStorage.setItem("harfan_user", JSON.stringify(response.user));
+        // For FormData, we need to send it directly without JSON.stringify
+        const response = await apiCall("/auth/register", {
+          method: "POST",
+          body: userData,
+          headers: {
+            // Remove Content-Type to let browser set it for FormData
+            // This is important for file uploads
+          },
+        });
 
-      dispatch(
-        signupSuccess({
-          user: response.user,
-          token: response.token,
-        })
-      );
+        console.log("Signup response:", response);
 
-      return response;
+        // User will need to verify email before login
+        dispatch(
+          signupSuccess({
+            user: {
+              id: response.id,
+              email: response.email,
+              firstName: response.first_name,
+              lastName: response.last_name,
+              role: response.role,
+              isActive: response.is_active,
+            },
+            token: null, // No token until email is verified
+          })
+        );
+
+        return response;
+      } else {
+        // Handle regular object data (legacy)
+        const formattedData = {
+          email: userData.email,
+          first_name: userData.firstName || userData.first_name,
+          last_name: userData.lastName || userData.last_name,
+          phone_number: userData.phone || userData.phone_number,
+          country: userData.country,
+          date_of_birth:
+            userData.dateOfBirth || userData.date_of_birth
+              ? formatDateToDjango(
+                  userData.dateOfBirth || userData.date_of_birth
+                )
+              : null,
+          password: userData.password,
+          password2: userData.confirmPassword || userData.password2,
+          role: userData.role,
+          ...(userData.role === "teacher" && {
+            specialty: userData.specialty,
+            years_of_experience:
+              userData.yearsOfExperience || userData.years_of_experience,
+            cv: userData.cv,
+          }),
+        };
+
+        console.log("Signup data being sent:", formattedData);
+
+        const response = await apiCall("/auth/register", {
+          method: "POST",
+          body: JSON.stringify(formattedData),
+        });
+
+        console.log("Signup response:", response);
+
+        // User will need to verify email before login
+        dispatch(
+          signupSuccess({
+            user: {
+              id: response.id,
+              email: response.email,
+              firstName: response.first_name,
+              lastName: response.last_name,
+              role: response.role,
+              isActive: response.is_active,
+            },
+            token: null, // No token until email is verified
+          })
+        );
+
+        return response;
+      }
     } catch (error) {
+      console.error("Signup error:", error);
       dispatch(signupFailure(error.message));
       throw error;
     }
@@ -185,49 +249,57 @@ export const authAPI = {
     const { dispatch } = store;
 
     try {
-      // TODO: Call backend logout endpoint when ready
-      // await apiCall('/auth/logout', { method: 'POST' });
-
-      // Clear localStorage
+      // Django JWT doesn't require server-side logout for stateless tokens
+      // Just clear localStorage and Redux state
       localStorage.removeItem("harfan_token");
+      localStorage.removeItem("harfan_refresh_token");
       localStorage.removeItem("harfan_user");
 
       dispatch({ type: "auth/logout" });
     } catch (error) {
       console.error("Logout error:", error);
-      // Clear localStorage even if API call fails
+      // Clear localStorage even if there's an error
       localStorage.removeItem("harfan_token");
+      localStorage.removeItem("harfan_refresh_token");
       localStorage.removeItem("harfan_user");
       dispatch({ type: "auth/logout" });
+    }
+  },
+
+  // Verify email
+  verifyEmail: async (token) => {
+    try {
+      const response = await apiCall(`/verify-email?token=${token}`, {
+        method: "GET",
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Email verification failed:", error);
+      throw error;
     }
   },
 
   // Refresh token
   refreshToken: async () => {
     try {
-      const response = await apiCall("/auth/refresh", {
+      const refreshToken = localStorage.getItem("harfan_refresh_token");
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+
+      const response = await apiCall("/auth/token/refresh/", {
         method: "POST",
+        body: JSON.stringify({
+          refresh: refreshToken,
+        }),
       });
 
-      localStorage.setItem("harfan_token", response.token);
+      localStorage.setItem("harfan_token", response.access);
 
-      return response.token;
+      return response.access;
     } catch (error) {
       console.error("Token refresh failed:", error);
-      throw error;
-    }
-  },
-
-  // Verify token
-  verifyToken: async () => {
-    try {
-      const response = await apiCall("/auth/verify", {
-        method: "GET",
-      });
-
-      return response;
-    } catch (error) {
-      console.error("Token verification failed:", error);
       throw error;
     }
   },
@@ -235,10 +307,10 @@ export const authAPI = {
 
 // User API calls
 export const userAPI = {
-  // Get user profile
+  // Get user profile (when endpoint is available)
   getProfile: async () => {
     try {
-      const response = await apiCall("/user/profile", {
+      const response = await apiCall("/api/profile/", {
         method: "GET",
       });
 
@@ -249,19 +321,19 @@ export const userAPI = {
     }
   },
 
-  // Update user profile
+  // Update user profile (when endpoint is available)
   updateProfile: async (userData) => {
     const { dispatch } = store;
 
     try {
       dispatch(updateProfileStart());
 
-      const response = await apiCall("/user/profile", {
+      const response = await apiCall("/api/profile/", {
         method: "PUT",
         body: JSON.stringify(userData),
       });
 
-      dispatch(updateProfileSuccess(response.user));
+      dispatch(updateProfileSuccess(response));
 
       return response;
     } catch (error) {
@@ -270,12 +342,15 @@ export const userAPI = {
     }
   },
 
-  // Change password
+  // Change password (when endpoint is available)
   changePassword: async (passwordData) => {
     try {
-      const response = await apiCall("/user/change-password", {
+      const response = await apiCall("/api/change-password/", {
         method: "POST",
-        body: JSON.stringify(passwordData),
+        body: JSON.stringify({
+          old_password: passwordData.oldPassword,
+          new_password: passwordData.newPassword,
+        }),
       });
 
       return response;
@@ -292,7 +367,7 @@ export const coursesAPI = {
   getCourses: async (filters = {}) => {
     try {
       const queryString = new URLSearchParams(filters).toString();
-      const endpoint = `/courses${queryString ? `?${queryString}` : ""}`;
+      const endpoint = `/api/courses/${queryString ? `?${queryString}` : ""}`;
 
       const response = await apiCall(endpoint, {
         method: "GET",
@@ -308,7 +383,7 @@ export const coursesAPI = {
   // Get course by ID
   getCourse: async (courseId) => {
     try {
-      const response = await apiCall(`/courses/${courseId}`, {
+      const response = await apiCall(`/api/courses/${courseId}/`, {
         method: "GET",
       });
 
@@ -322,7 +397,7 @@ export const coursesAPI = {
   // Enroll in course
   enrollInCourse: async (courseId) => {
     try {
-      const response = await apiCall(`/courses/${courseId}/enroll`, {
+      const response = await apiCall(`/api/courses/${courseId}/enroll/`, {
         method: "POST",
       });
 
@@ -341,4 +416,59 @@ export { API_CONFIG };
 export const initializeAPI = (baseURL) => {
   API_CONFIG.baseURL = baseURL;
   console.log(`API initialized with base URL: ${baseURL}`);
+};
+
+// Helper to restore user session from localStorage
+export const restoreUserSession = () => {
+  const { dispatch } = store;
+
+  try {
+    const token = localStorage.getItem("harfan_token");
+    const userStr = localStorage.getItem("harfan_user");
+
+    if (token && userStr) {
+      const user = JSON.parse(userStr);
+      dispatch(loginSuccess({ user, token }));
+    }
+  } catch (error) {
+    console.error("Failed to restore user session:", error);
+    // Clear corrupted localStorage
+    localStorage.removeItem("harfan_token");
+    localStorage.removeItem("harfan_refresh_token");
+    localStorage.removeItem("harfan_user");
+  }
+};
+
+// Helper to clear all authentication data
+export const clearAuthData = () => {
+  localStorage.removeItem("harfan_token");
+  localStorage.removeItem("harfan_refresh_token");
+  localStorage.removeItem("harfan_user");
+
+  const { dispatch } = store;
+  dispatch({ type: "auth/logout" });
+
+  console.log("All auth data cleared");
+};
+
+// Helper function to format date for Django backend (dd/mm/yyyy)
+const formatDateToDjango = (dateString) => {
+  if (!dateString) return null;
+
+  // If it's already in dd/mm/yyyy format, return as is
+  if (dateString.includes("/")) {
+    return dateString;
+  }
+
+  // Convert from YYYY-MM-DD to dd/mm/yyyy
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return dateString; // Return original if invalid
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
 };

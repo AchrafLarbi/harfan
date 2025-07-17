@@ -19,16 +19,22 @@ export default function Signup() {
   const [role, setRole] = useState("student");
   const [agreed, setAgreed] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    first_name: "",
+    last_name: "",
     email: "",
-    phone: "",
+    phone_number: "",
     password: "",
     confirmPassword: "",
     country: "",
+    date_of_birth: "",
+    specialty: "",
+    years_of_experience: "",
+    cv: null,
+    profile_picture: null,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const { signup, isLoading, error, clearAuthError } = useAuth();
 
@@ -37,6 +43,14 @@ export default function Signup() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files[0] || null,
     }));
   };
 
@@ -55,11 +69,53 @@ export default function Signup() {
     }
 
     try {
-      await signup({
-        ...formData,
-        role,
-      });
+      // Create FormData for file uploads
+      const submitData = new FormData();
+
+      // Convert date format from yyyy-mm-dd to dd/mm/yyyy
+      const convertDateFormat = (dateString) => {
+        if (!dateString) return "";
+        const [year, month, day] = dateString.split("-");
+        return `${day}/${month}/${year}`;
+      };
+
+      // Add all text fields
+      submitData.append("first_name", formData.first_name);
+      submitData.append("last_name", formData.last_name);
+      submitData.append("email", formData.email);
+      submitData.append("phone_number", formData.phone_number);
+      submitData.append("password", formData.password);
+      submitData.append("password2", formData.password); // Backend expects password2
+      submitData.append("role", role);
+      submitData.append("country", formData.country);
+      submitData.append(
+        "date_of_birth",
+        convertDateFormat(formData.date_of_birth)
+      );
+
+      // Add teacher-specific fields if teacher
+      if (role === "teacher") {
+        submitData.append("specialty", formData.specialty);
+        submitData.append("years_of_experience", formData.years_of_experience);
+
+        // Add CV file if selected
+        if (formData.cv) {
+          submitData.append("cv", formData.cv);
+        }
+      }
+
+      // Add profile picture if selected
+      if (formData.profile_picture) {
+        submitData.append("profile_picture", formData.profile_picture);
+      }
+
+      await signup(submitData);
       console.log("Signup successful!");
+      setShowSuccessPopup(true);
+      // Auto-hide popup after 3 seconds
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 3000);
     } catch (err) {
       console.error("Signup failed:", err);
     }
@@ -71,6 +127,31 @@ export default function Signup() {
       dir="rtl"
       style={{ backgroundImage: `url(${background})` }}
     >
+      {/* Success Popup */}
+      <AnimatePresence>
+        {showSuccessPopup && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: -50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -50 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 max-w-md"
+          >
+            <FaCheckCircle className="text-2xl" />
+            <div>
+              <h3 className="font-bold text-lg">تم إنشاء الحساب بنجاح!</h3>
+              <p className="text-sm opacity-90">مرحباً بك في عائلة حرفان</p>
+            </div>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="ml-auto text-white hover:text-gray-200 transition-colors"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full opacity-30 -z-10" />
       <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-30 -z-10" />
 
@@ -232,11 +313,15 @@ export default function Signup() {
                             d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"
                           />
                         </svg>
-                        اسحب وأفلت سيرتك الذاتية أو اختر ملفك
+                        {formData.cv
+                          ? formData.cv.name
+                          : "اسحب وأفلت سيرتك الذاتية أو اختر ملفك"}
                       </span>
                       <input
                         type="file"
+                        name="cv"
                         accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        onChange={handleFileChange}
                         className="hidden"
                       />
                       <span className="text-xs text-gray-500 mt-1">
@@ -251,8 +336,11 @@ export default function Signup() {
                     <input
                       className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                       type="number"
+                      name="years_of_experience"
                       min="0"
                       placeholder="مثال: 5"
+                      value={formData.years_of_experience}
+                      onChange={handleInputChange}
                       required
                     />
                   </div>
@@ -263,7 +351,10 @@ export default function Signup() {
                     <input
                       className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                       type="text"
+                      name="specialty"
                       placeholder="مثال: اللغة العربية، القرآن الكريم"
+                      value={formData.specialty}
+                      onChange={handleInputChange}
                       required
                     />
                   </div>
@@ -294,9 +385,9 @@ export default function Signup() {
                   <input
                     className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                     type="text"
-                    name="firstName"
+                    name="first_name"
                     placeholder="أحمد"
-                    value={formData.firstName}
+                    value={formData.first_name}
                     onChange={handleInputChange}
                     required
                   />
@@ -311,13 +402,53 @@ export default function Signup() {
                   <input
                     className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                     type="text"
-                    name="lastName"
+                    name="last_name"
                     placeholder="محمد"
-                    value={formData.lastName}
+                    value={formData.last_name}
                     onChange={handleInputChange}
                     required
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Profile Picture Upload - for both students and teachers */}
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">
+                صورة الملف الشخصي (اختياري)
+              </label>
+              <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50">
+                <label className="flex flex-col items-center cursor-pointer w-full">
+                  <span className="text-gray-600 font-medium mb-2 flex items-center gap-2">
+                    <svg
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {formData.profile_picture
+                      ? formData.profile_picture.name
+                      : "اختر صورة الملف الشخصي"}
+                  </span>
+                  <input
+                    type="file"
+                    name="profile_picture"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <span className="text-xs text-gray-500 mt-1">
+                    PNG, JPG, JPEG up to 10MB
+                  </span>
+                </label>
               </div>
             </div>
             {/* Student-only phone number field */}
@@ -331,9 +462,9 @@ export default function Signup() {
                   <input
                     className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                     type="tel"
-                    name="phone"
+                    name="phone_number"
                     placeholder="+213 ..."
-                    value={formData.phone}
+                    value={formData.phone_number}
                     onChange={handleInputChange}
                     required
                   />
@@ -365,6 +496,9 @@ export default function Signup() {
                 <input
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                   type="date"
+                  name="date_of_birth"
+                  value={formData.date_of_birth}
+                  onChange={handleInputChange}
                   required
                 />
               </div>

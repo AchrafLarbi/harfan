@@ -27,14 +27,27 @@ export default function Login() {
     clearAuthError();
 
     try {
-      await login({
+      const loginData = {
         email,
         password,
         role,
         remember,
-      });
-      // Handle successful login (e.g., redirect)
+      };
+
+      console.log("Login attempt with role:", role);
+
+      await login(loginData);
       console.log("Login successful!");
+
+      // Handle successful login (e.g., redirect)
+      // You might want to redirect based on role
+      if (role === "teacher") {
+        // Redirect to teacher dashboard
+        window.location.href = "/teacher-dashboard";
+      } else {
+        // Redirect to student dashboard
+        window.location.href = "/student-dashboard";
+      }
     } catch (err) {
       console.error("Login failed:", err);
       // Error is handled by Redux state
@@ -66,9 +79,10 @@ export default function Login() {
             تسجيل الدخول
           </h2>
           <p className="text-gray-500 text-sm text-center mb-6">
-            اختر نوع حسابك للمتابعة
+            اختر نوع حسابك للمتابعة -{" "}
+            {role === "teacher" ? "تسجيل دخول المعلمين" : "تسجيل دخول الطلاب"}
           </p>
-          <div className="flex mb-6 gap-2 rounded-lg p-1 relative overflow-hidden p-6">
+          <div className="flex mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
             <motion.div
               layout
               initial={false}
