@@ -24,6 +24,26 @@ const API_CONFIG = {
   timeout: 10000,
 };
 
+// Helper function to decode JWT token
+export const decodeJWT = (token) => {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
+};
+
 // Helper function to get auth token
 const getAuthToken = () => {
   const state = store.getState();
@@ -100,15 +120,19 @@ export const authAPI = {
         body: JSON.stringify({
           email: credentials.email,
           password: credentials.password,
-          role: credentials.role, // Include role for verification
+          // Don't send role - it's in the JWT token
         }),
       });
 
+      // Decode JWT token to get user role
+      const decodedToken = decodeJWT(response.access);
+      const userRoleFromToken = decodedToken?.role || response.user?.role;
+
       // Verify that the user's role matches the selected role
-      if (response.user?.role !== credentials.role) {
+      if (userRoleFromToken !== credentials.role) {
         throw new Error(
           `هذا الحساب مخصص لـ ${
-            response.user?.role === "teacher" ? "المعلمين" : "الطلاب"
+            userRoleFromToken === "teacher" ? "المعلمين" : "الطلاب"
           } فقط`
         );
       }
@@ -119,22 +143,22 @@ export const authAPI = {
       localStorage.setItem(
         "harfan_user",
         JSON.stringify({
-          id: response.user?.id,
+          id: response.user?.id || decodedToken?.user_id,
           email: credentials.email,
           firstName: response.user?.first_name,
           lastName: response.user?.last_name,
-          role: response.user?.role,
+          role: userRoleFromToken, // Use role from JWT token
         })
       );
 
       dispatch(
         loginSuccess({
           user: {
-            id: response.user?.id,
+            id: response.user?.id || decodedToken?.user_id,
             email: credentials.email,
             firstName: response.user?.first_name,
             lastName: response.user?.last_name,
-            role: response.user?.role,
+            role: userRoleFromToken, // Use role from JWT token
           },
           token: response.access,
         })
