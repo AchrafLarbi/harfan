@@ -1,39 +1,79 @@
-import { BookmarkIcon, BookOpenIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import {
+  BookmarkIcon,
+  BookOpenIcon,
+  Bars3Icon,
+} from "@heroicons/react/24/outline";
+import { useState, useEffect } from "react";
 
 export default function HeroSection() {
+  // Real-time countdown state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 55,
+    hours: 20,
+    minutes: 12,
+    seconds: 39,
+  });
+
+  // Update countdown every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        let { days, hours, minutes, seconds } = prevTime;
+
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          seconds = 59;
+          minutes--;
+        } else if (hours > 0) {
+          seconds = 59;
+          minutes = 59;
+          hours--;
+        } else if (days > 0) {
+          seconds = 59;
+          minutes = 59;
+          hours = 23;
+          days--;
+        }
+
+        return { days, hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const statisticsData = [
     {
       id: 1,
-      number: "500+",
-      label: "طالب نشط",
+      number: timeLeft.days.toString().padStart(2, "0"),
+      label: "أيام",
     },
     {
       id: 2,
-      number: "1000+",
-      label: "درس تفاعلي",
+      number: timeLeft.hours.toString().padStart(2, "0"),
+      label: "ساعات",
     },
     {
       id: 3,
-      number: "50+",
-      label: "معلم متخصص",
+      number: timeLeft.minutes.toString().padStart(2, "0"),
+      label: "دقائق",
     },
     {
       id: 4,
-      number: "98%",
-      label: "رضا العملاء",
+      number: timeLeft.seconds.toString().padStart(2, "0"),
+      label: "ثواني",
     },
   ];
 
   return (
-    <section
-      id="home"
-      className="py-10"
-      dir="rtl"
-      data-aos="fade-up"
-    >
+    <section id="home" className="py-10" dir="rtl" data-aos="fade-up">
       <div className="max-w-6xl mx-auto px-6 p-10">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-12" data-aos="fade-down">
+          <div
+            className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-12"
+            data-aos="fade-down"
+          >
             <BookmarkIcon className="w-5 h-5 text-primary" />
             <span className="text-primary font-medium text-sm">
               منصة تعليمية إسلامية متطورة
@@ -75,14 +115,22 @@ export default function HeroSection() {
             </h2>
           </div>
 
-          <p className="text-xl text-gray-500 max-w-3xl mx-auto mb-12 leading-relaxed " data-aos="fade-up" data-aos-delay="200">
+          <p
+            className="text-xl text-gray-500 max-w-3xl mx-auto mb-12 leading-relaxed "
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
             تعليم مبسط وتفاعلي، أنشطة حية ومحفزة، تواصل مباشر مع المعلمين، وتطور
             مستمر
             <br />
             في بيئة إسلامية آمنة.
           </p>
 
-          <div className="flex gap-4 justify-center items-center mb-20" data-aos="zoom-in" data-aos-delay="300">
+          <div
+            className="flex gap-4 justify-center items-center mb-20"
+            data-aos="zoom-in"
+            data-aos-delay="300"
+          >
             <button className="bg-primary text-white font-medium px-6 py-3 rounded-full flex items-center gap-2">
               <BookOpenIcon className="w-5 h-5" />
               ابدأ رحلتك التعليمية
@@ -93,17 +141,77 @@ export default function HeroSection() {
             </button>
           </div>
 
-          <div className="grid grid-cols-4 gap-8 max-w-4xl mx-auto">
-            {statisticsData.map((stat, i) => (
-              <div key={stat.id} className="text-center" data-aos="fade-up" data-aos-delay={400 + i * 100}>
-                <div className="text-3xl font-bold text-primary mb-2">
-                  {stat.number}
+          {/* Countdown Section */}
+          <div className="mb-8">
+            <p className="text-gray-600 mb-6 text-2xl">
+              رحلتك نحو العلم تبدأ قريباً...
+            </p>
+            <div className="flex justify-center items-center gap-8 max-w-3xl mx-auto mb-4">
+              {statisticsData.map((stat, i) => (
+                <div
+                  key={stat.id}
+                  className="text-center"
+                  data-aos="fade-up"
+                  data-aos-delay={400 + i * 100}
+                >
+                  {/* Flip Card Container */}
+                  <div className="relative">
+                    {/* Main Card */}
+                    <div className="relative w-24 h-32">
+                      {/* Card Background with Notches */}
+                      <div
+                        className="absolute inset-0 bg-primary shadow-xl"
+                        style={{
+                          borderRadius: "16px",
+                        }}
+                      ></div>
+
+                      {/* Left Notch */}
+                      <div className="absolute left-0 top-1/2 w-3 h-6 bg-primary transform -translate-y-1/2 -translate-x-1.5 rounded-3xl"></div>
+
+                      {/* Right Notch */}
+                      <div className="absolute right-0 top-1/2 w-3 h-6 bg-primary transform -translate-y-1/2 translate-x-1.5 rounded-3xl"></div>
+
+                      {/* Content Container */}
+                      <div className="relative w-full h-full text-white flex items-center justify-center">
+                        {/* Top Half */}
+                        <div
+                          className="absolute top-0 left-0 right-0 h-1/2 bg-primary border-b border-primary "
+                          style={{
+                            borderTopLeftRadius: "16px",
+                            borderTopRightRadius: "16px",
+                          }}
+                        ></div>
+
+                        {/* Bottom Half */}
+                        <div
+                          className="absolute bottom-0 left-0 right-0 h-1/2 bg-primary"
+                          style={{
+                            borderBottomLeftRadius: "16px",
+                            borderBottomRightRadius: "16px",
+                          }}
+                        ></div>
+
+                        {/* Middle Line */}
+                        <div className="absolute top-1/2 left-2 right-2 h-[1px] bg-[#3A4FB7] transform -translate-y-1/2"></div>
+
+                        {/* Number */}
+                        <div className="relative z-10 text-4xl font-bold">
+                          {stat.number}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Label */}
+                  <div className="text-gray-600 font-medium text-base mt-4">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-gray-500 font-medium text-xl">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <p className="text-gray-500 text-2xl">
+              نعدّ الثواني لانطلاق منصّتنا التعليمية!
+            </p>
           </div>
         </div>
       </div>

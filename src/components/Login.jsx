@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import {
   FaChalkboardTeacher,
@@ -193,7 +194,10 @@ export default function Login() {
                 />
                 تذكرني
               </label>
-              <a href="#" className="text-primary hover:underline">
+              <a
+                href="/forgot-password"
+                className="text-primary hover:underline"
+              >
                 نسيت كلمة المرور؟
               </a>
             </div>

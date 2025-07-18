@@ -66,7 +66,13 @@ const apiCall = async (endpoint, options = {}) => {
     const url = createApiUrl(endpoint);
 
     // Public endpoints that don't require authentication
-    const publicEndpoints = ["/auth/register", "/auth/login", "/verify-email"];
+    const publicEndpoints = [
+      "/auth/register",
+      "/auth/login",
+      "/verify-email",
+      "/auth/request-reset-password/",
+      "/auth/reset-password/",
+    ];
     const isPublicEndpoint = publicEndpoints.some((publicEndpoint) =>
       endpoint.startsWith(publicEndpoint)
     );
@@ -327,6 +333,43 @@ export const authAPI = {
       throw error;
     }
   },
+
+  // Request password reset
+  requestPasswordReset: async (email) => {
+    try {
+      const response = await apiCall("/auth/request-reset-password/", {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+
+      return response;
+    } catch (error) {
+      console.error("Password reset request failed:", error);
+      throw error;
+    }
+  },
+
+  // Reset password with token
+  resetPassword: async (newPassword, encodedPk, token) => {
+    try {
+      const response = await apiCall(
+        `/auth/reset-password/${encodedPk}/${token}/`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            new_password: newPassword,
+          }),
+        }
+      );
+
+      return response;
+    } catch (error) {
+      console.error("Password reset failed:", error);
+      throw error;
+    }
+  },
 };
 
 // User API calls
@@ -380,54 +423,6 @@ export const userAPI = {
       return response;
     } catch (error) {
       console.error("Change password failed:", error);
-      throw error;
-    }
-  },
-};
-
-// Courses API calls (for future use)
-export const coursesAPI = {
-  // Get all courses
-  getCourses: async (filters = {}) => {
-    try {
-      const queryString = new URLSearchParams(filters).toString();
-      const endpoint = `/api/courses/${queryString ? `?${queryString}` : ""}`;
-
-      const response = await apiCall(endpoint, {
-        method: "GET",
-      });
-
-      return response;
-    } catch (error) {
-      console.error("Get courses failed:", error);
-      throw error;
-    }
-  },
-
-  // Get course by ID
-  getCourse: async (courseId) => {
-    try {
-      const response = await apiCall(`/api/courses/${courseId}/`, {
-        method: "GET",
-      });
-
-      return response;
-    } catch (error) {
-      console.error("Get course failed:", error);
-      throw error;
-    }
-  },
-
-  // Enroll in course
-  enrollInCourse: async (courseId) => {
-    try {
-      const response = await apiCall(`/api/courses/${courseId}/enroll/`, {
-        method: "POST",
-      });
-
-      return response;
-    } catch (error) {
-      console.error("Course enrollment failed:", error);
       throw error;
     }
   },

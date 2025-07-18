@@ -4,6 +4,8 @@ import Landing from "./components/Landing";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import VerifyEmail from "./components/VerifyEmail";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 import { restoreUserSession } from "./services/api";
 
@@ -20,6 +22,11 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/auth/reset-password/:encoded_pk/:token"
+          element={<ResetPassword />}
+        />
       </Routes>
     </Router>
   );

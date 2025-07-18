@@ -1,10 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import {
   FaChalkboardTeacher,
   FaBookOpen,
   FaCheckCircle,
-  FaStar,
-  FaShieldAlt,
   FaEnvelope,
   FaLock,
   FaUser,
@@ -203,14 +202,14 @@ export default function Signup() {
 
       {/* Centered Form */}
       <div className="flex-1 flex items-center justify-center pb-8">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
+        <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl p-8 md:p-10">
           <h2 className="text-2xl font-bold mb-1 text-center text-gray-800">
             إنشاء حساب جديد
           </h2>
           <p className="text-gray-500 text-sm text-center mb-6">
             اختر نوع حسابك للمتابعة
           </p>
-          <div className="flex mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
+          <div className="flex mx-auto max-w-xl  mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
             {/* Animated sliding indicator */}
             <motion.div
               layout
@@ -520,6 +519,16 @@ export default function Signup() {
                   <option value="kuwait">الكويت</option>
                   <option value="bahrain">البحرين</option>
                   <option value="oman">عمان</option>
+                  <option value="jordan">الأردن</option>
+                  <option value="lebanon">لبنان</option>
+                  <option value="syria">سوريا</option>
+                  <option value="iraq">العراق</option>
+                  <option value="palestine">فلسطين</option>
+                  <option value="yemen">اليمن</option>
+                  <option value="algeria">الجزائر</option>
+                  <option value="morocco">المغرب</option>
+                  <option value="tunisia">تونس</option>
+                  <option value="libya">ليبيا</option>
                 </select>
               </div>
             </div>
