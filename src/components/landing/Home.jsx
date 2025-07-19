@@ -14,11 +14,28 @@ export default function HeroSection() {
     seconds: 39,
   });
 
+  // Previous values to detect changes
+  const [prevTimeLeft, setPrevTimeLeft] = useState({
+    days: 55,
+    hours: 20,
+    minutes: 12,
+    seconds: 39,
+  });
+
+  // Flip animation states
+  const [flipStates, setFlipStates] = useState({
+    days: false,
+    hours: false,
+    minutes: false,
+    seconds: false,
+  });
+
   // Update countdown every second
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         let { days, hours, minutes, seconds } = prevTime;
+        const newTime = { ...prevTime };
 
         if (seconds > 0) {
           seconds--;
@@ -36,7 +53,32 @@ export default function HeroSection() {
           days--;
         }
 
-        return { days, hours, minutes, seconds };
+        const updatedTime = { days, hours, minutes, seconds };
+
+        // Check for changes and trigger flip animations
+        const newFlipStates = {
+          days: newTime.days !== days,
+          hours: newTime.hours !== hours,
+          minutes: newTime.minutes !== minutes,
+          seconds: newTime.seconds !== seconds,
+        };
+
+        if (Object.values(newFlipStates).some(Boolean)) {
+          setFlipStates(newFlipStates);
+          setPrevTimeLeft(newTime);
+
+          // Reset flip states after animation
+          setTimeout(() => {
+            setFlipStates({
+              days: false,
+              hours: false,
+              minutes: false,
+              seconds: false,
+            });
+          }, 600);
+        }
+
+        return updatedTime;
       });
     }, 1000);
 
@@ -46,22 +88,30 @@ export default function HeroSection() {
   const statisticsData = [
     {
       id: 1,
+      key: "days",
       number: timeLeft.days.toString().padStart(2, "0"),
+      prevNumber: prevTimeLeft.days.toString().padStart(2, "0"),
       label: "أيام",
     },
     {
       id: 2,
+      key: "hours",
       number: timeLeft.hours.toString().padStart(2, "0"),
+      prevNumber: prevTimeLeft.hours.toString().padStart(2, "0"),
       label: "ساعات",
     },
     {
       id: 3,
+      key: "minutes",
       number: timeLeft.minutes.toString().padStart(2, "0"),
+      prevNumber: prevTimeLeft.minutes.toString().padStart(2, "0"),
       label: "دقائق",
     },
     {
       id: 4,
+      key: "seconds",
       number: timeLeft.seconds.toString().padStart(2, "0"),
+      prevNumber: prevTimeLeft.seconds.toString().padStart(2, "0"),
       label: "ثواني",
     },
   ];
@@ -69,6 +119,40 @@ export default function HeroSection() {
   return (
     <section id="home" className="py-10" dir="rtl" data-aos="fade-up">
       <div className="max-w-6xl mx-auto px-6 p-10">
+        <style jsx>{`
+          .flip-card {
+            perspective: 400px;
+          }
+
+          @keyframes flipUp {
+            0% {
+              transform: rotateX(0deg);
+            }
+            50% {
+              transform: rotateX(90deg);
+            }
+            100% {
+              transform: rotateX(0deg);
+            }
+          }
+
+          @keyframes flipTop {
+            0% {
+              transform: rotateX(0deg);
+            }
+            50% {
+              transform: rotateX(-90deg);
+            }
+            100% {
+              transform: rotateX(0deg);
+            }
+          }
+
+          .flip-animation {
+            animation: flipUp 0.6s ease-in-out;
+            transform-origin: bottom;
+          }
+        `}</style>
         <div className="text-center">
           <div
             className="inline-flex items-center gap-2 bg-[#3D4D9C33] rounded-full px-6 py-3 mb-12"
@@ -157,7 +241,7 @@ export default function HeroSection() {
                   {/* Flip Card Container */}
                   <div className="relative">
                     {/* Main Card */}
-                    <div className="relative w-24 h-32">
+                    <div className="relative w-32 h-32">
                       {/* Card Background with Notches */}
                       <div
                         className="absolute inset-0 bg-primary shadow-xl"
@@ -173,43 +257,61 @@ export default function HeroSection() {
                       <div className="absolute right-0 top-1/2 w-3 h-6 bg-primary transform -translate-y-1/2 translate-x-1.5 rounded-3xl"></div>
 
                       {/* Content Container */}
-                      <div className="relative w-full h-full text-white flex items-center justify-center">
-                        {/* Top Half */}
-                        <div
-                          className="absolute top-0 left-0 right-0 h-1/2 bg-primary border-b border-primary "
-                          style={{
-                            borderTopLeftRadius: "16px",
-                            borderTopRightRadius: "16px",
-                          }}
-                        ></div>
+                      <div
+                        className="relative w-full h-full text-white flex flex-col overflow-hidden"
+                        style={{
+                          borderRadius: "16px",
+                        }}
+                      >
+                        {/* Top Half with Flip Animation */}
+                        <div className="relative h-full overflow-hidden">
+                          <div
+                            className={`absolute inset-0 bg-primary flex items-center justify-center ${
+                              flipStates[stat.key] ? "flip-animation" : ""
+                            }`}
+                            style={{
+                              borderRadius: "16px",
+                            }}
+                          >
+                            <div className="text-8xl font-bold">
+                              {flipStates[stat.key]
+                                ? stat.prevNumber
+                                : stat.number}
+                            </div>
+                          </div>
 
-                        {/* Bottom Half */}
-                        <div
-                          className="absolute bottom-0 left-0 right-0 h-1/2 bg-primary"
-                          style={{
-                            borderBottomLeftRadius: "16px",
-                            borderBottomRightRadius: "16px",
-                          }}
-                        ></div>
+                          {/* Middle Line */}
+                          <div className="absolute top-1/2 left-2 right-2 h-1 transform -translate-y-1/2 z-10 bg-[#2B3C8E] "></div>
 
-                        {/* Middle Line */}
-                        <div className="absolute top-1/2 left-2 right-2 h-[1px] bg-[#3A4FB7] transform -translate-y-1/2"></div>
-
-                        {/* Number */}
-                        <div className="relative z-10 text-4xl font-bold">
-                          {stat.number}
+                          {/* Flipping number overlay */}
+                          {flipStates[stat.key] && (
+                            <div
+                              className="absolute inset-0 bg-primary flex items-center justify-center"
+                              style={{
+                                borderRadius: "16px",
+                                animation: "flipTop 0.6s ease-in-out",
+                                animationDelay: "0.3s",
+                                animationFillMode: "forwards",
+                              }}
+                            >
+                              <div className="text-8xl font-bold">
+                                {stat.number}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
+
                   {/* Label */}
-                  <div className="text-gray-600 font-medium text-base mt-4">
+                  <div className="text-gray-600 font-light text-2xl mt-4">
                     {stat.label}
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-gray-500 text-2xl">
+            <p className="text-gray-500 text-2xl font-medium">
               نعدّ الثواني لانطلاق منصّتنا التعليمية!
             </p>
           </div>
