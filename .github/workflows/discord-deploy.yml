@@ -1,0 +1,19 @@
+name: Notify Discord on Deployment
+
+on:
+  deployment_status:
+    types: [created, success, failure]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "content": "Deployment status: '"${{ github.event.deployment_status.state }}"'\n🔗 Repo: '"${{ github.repository }}"'\n🔧 Env: '"${{ github.event.deployment.environment }}"'"
+            }'
