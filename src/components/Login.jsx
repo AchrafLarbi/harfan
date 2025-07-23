@@ -13,6 +13,7 @@ import logo2 from "../assets/logo/browserLogo.png";
 import background from "../assets/Landing Page.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../hooks/useAuth";
+import { store } from "../store/store";
 
 export default function Login() {
   const [role, setRole] = useState("student");
@@ -37,16 +38,28 @@ export default function Login() {
 
       console.log("Login attempt with role:", role);
 
-      await login(loginData);
-      console.log("Login successful!");
+      const result = await login(loginData);
+      console.log("Login successful!", result);
 
-      // Handle successful login (e.g., redirect)
-      // You might want to redirect based on role
-      if (role === "teacher") {
+      // Get user data directly from login result
+      const userData = result.user || {};
+      const isAdmin = userData.is_staff || userData.is_superuser;
+
+      console.log("User data from login result:", userData);
+      console.log("Is admin?", isAdmin);
+
+      // Handle successful login redirection
+      if (isAdmin) {
+        // Redirect admin users to dashboard
+        console.log("Redirecting admin to /admin/dashboard");
+        window.location.href = "/admin/dashboard";
+      } else if (role === "teacher") {
         // Redirect to teacher dashboard
+        console.log("Redirecting teacher to /teacher-dashboard");
         window.location.href = "/teacher-dashboard";
       } else {
         // Redirect to student dashboard
+        console.log("Redirecting student to /student-dashboard");
         window.location.href = "/student-dashboard";
       }
     } catch (err) {
@@ -82,6 +95,10 @@ export default function Login() {
           <p className="text-gray-500 text-sm text-center mb-6">
             اختر نوع حسابك للمتابعة -{" "}
             {role === "teacher" ? "تسجيل دخول المعلمين" : "تسجيل دخول الطلاب"}
+            <br />
+            <span className="text-xs text-gray-400 mt-1 block">
+              المديرون يمكنهم الدخول باستخدام أي من الخيارين
+            </span>
           </p>
           <div className="flex mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
             <motion.div

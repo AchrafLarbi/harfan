@@ -6,6 +6,9 @@ import Login from "./components/Login";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
+import AdminContentManager from "./components/AdminContentManager";
+import DashboardOverview from "./components/Dashboard/DashboardOverview";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 import { restoreUserSession } from "./services/api";
 
@@ -26,6 +29,30 @@ export default function App() {
         <Route
           path="/auth/reset-password/:encoded_pk/:token"
           element={<ResetPassword />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedAdminRoute>
+              <DashboardOverview />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/content"
+          element={
+            <ProtectedAdminRoute>
+              <AdminContentManager />
+            </ProtectedAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedAdminRoute>
+              <DashboardOverview />
+            </ProtectedAdminRoute>
+          }
         />
       </Routes>
     </Router>

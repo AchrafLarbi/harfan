@@ -126,16 +126,22 @@ export const authAPI = {
         body: JSON.stringify({
           email: credentials.email,
           password: credentials.password,
-          // Don't send role - it's in the JWT token
         }),
       });
 
-      // Decode JWT token to get user role
+      // Decode JWT token to get user role and admin status
       const decodedToken = decodeJWT(response.access);
+      console.log("Decoded JWT:", decodedToken);
       const userRoleFromToken = decodedToken?.role || response.user?.role;
+      const isAdmin =
+        decodedToken?.role === "admin" || decodedToken?.is_superuser;
 
       // Verify that the user's role matches the selected role
-      if (userRoleFromToken !== credentials.role) {
+      // Skip role verification for admin users
+      console.log("isAdmin", userRoleFromToken);
+      if (isAdmin) {
+        console.log("Admin user logged in:", decodedToken);
+      } else if (userRoleFromToken !== credentials.role) {
         throw new Error(
           `هذا الحساب مخصص لـ ${
             userRoleFromToken === "teacher" ? "المعلمين" : "الطلاب"
@@ -154,6 +160,9 @@ export const authAPI = {
           firstName: response.user?.first_name,
           lastName: response.user?.last_name,
           role: userRoleFromToken, // Use role from JWT token
+          is_staff: response.user?.is_staff || decodedToken?.is_staff || false,
+          is_superuser:
+            response.user?.is_superuser || decodedToken?.is_superuser || false,
         })
       );
 
@@ -165,6 +174,12 @@ export const authAPI = {
             firstName: response.user?.first_name,
             lastName: response.user?.last_name,
             role: userRoleFromToken, // Use role from JWT token
+            is_staff:
+              response.user?.is_staff || decodedToken?.is_staff || false,
+            is_superuser:
+              response.user?.is_superuser ||
+              decodedToken?.is_superuser ||
+              false,
           },
           token: response.access,
         })

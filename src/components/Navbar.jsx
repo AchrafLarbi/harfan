@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import logo from "../assets/logo/logo.png";
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const navigationItems = [
   { label: "الرئيسية", href: "#home", id: "home" },
@@ -17,6 +18,11 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Get auth state from Redux
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const isAdmin =
+    isAuthenticated && user && (user.is_staff || user.is_superuser);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,7 +75,11 @@ export default function Navbar() {
               className="text-[#3D4D9C] hover:bg-[#3D4D9C]/10 focus:bg-[#3D4D9C]/20 p-2 rounded-full focus:outline-none transition"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
+              {isMenuOpen ? (
+                <XMarkIcon className="w-6 h-6" />
+              ) : (
+                <Bars3Icon className="w-6 h-6" />
+              )}
             </button>
           </div>
 
@@ -84,7 +94,9 @@ export default function Navbar() {
                     handleNavClick(item.href);
                   }}
                   className={`text-base font-semibold transition-colors duration-200 hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl cursor-pointer relative ${
-                    activeSection === item.id ? "text-[#3D4D9C]" : "text-gray-700"
+                    activeSection === item.id
+                      ? "text-[#3D4D9C]"
+                      : "text-gray-700"
                   }`}
                   tabIndex={0}
                 >
@@ -115,7 +127,9 @@ export default function Navbar() {
                     handleNavClick(item.href);
                   }}
                   className={`text-base font-semibold transition-colors duration-200 hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl cursor-pointer relative ${
-                    activeSection === item.id ? "text-[#3D4D9C]" : "text-gray-700"
+                    activeSection === item.id
+                      ? "text-[#3D4D9C]"
+                      : "text-gray-700"
                   }`}
                   tabIndex={0}
                 >
@@ -125,6 +139,41 @@ export default function Navbar() {
                   )}
                 </a>
               ))}
+
+              {/* Admin Content Management Link - Only show for admin users */}
+              {isAdmin && (
+                <a
+                  href="/admin/content"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick("/admin/content");
+                  }}
+                  className="text-base font-semibold transition-colors duration-200 focus:bg-[#3D4D9C]/10 rounded-xl cursor-pointer relative text-amber-600 hover:text-amber-700"
+                  tabIndex={0}
+                  title="إدارة المحتوى"
+                >
+                  <svg
+                    className="w-5 h-5 inline-block ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  إدارة المحتوى
+                </a>
+              )}
             </div>
           </div>
 
@@ -154,8 +203,8 @@ export default function Navbar() {
                       href={item.href}
                       className={
                         idx === 0
-                          ? 'block text-[#3D4D9C] font-semibold'
-                          : 'block hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl transition px-3 py-2 cursor-pointer'
+                          ? "block text-[#3D4D9C] font-semibold"
+                          : "block hover:text-[#3D4D9C] focus:text-[#3D4D9C] focus:bg-[#3D4D9C]/10 hover:bg-[#3D4D9C]/10 rounded-xl transition px-3 py-2 cursor-pointer"
                       }
                       onClick={() => setIsMenuOpen(false)}
                       tabIndex={0}
@@ -164,6 +213,39 @@ export default function Navbar() {
                     </a>
                   </li>
                 ))}
+
+                {/* Admin Content Management Link for Mobile - Only show for admin users */}
+                {isAdmin && (
+                  <li>
+                    <a
+                      href="/admin/content"
+                      className="block text-amber-600 hover:text-amber-700 focus:text-amber-700 focus:bg-amber-100 hover:bg-amber-100 rounded-xl transition px-3 py-2 cursor-pointer font-semibold"
+                      onClick={() => setIsMenuOpen(false)}
+                      tabIndex={0}
+                    >
+                      <svg
+                        className="w-4 h-4 inline-block ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      إدارة المحتوى
+                    </a>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>
