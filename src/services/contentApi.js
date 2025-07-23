@@ -95,6 +95,34 @@ export const contentService = {
       throw error;
     }
   },
+
+  createPlan: async (data, token) => {
+    try {
+      const response = await contentAPI.post(`/plans/`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating plan:", error);
+      throw error;
+    }
+  },
+
+  deletePlan: async (planId, token) => {
+    try {
+      const response = await contentAPI.delete(`/plans/${planId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting plan:", error);
+      throw error;
+    }
+  },
 };
 
 export default contentService;

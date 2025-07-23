@@ -6,7 +6,7 @@ import Login from "./components/Login";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
-import AdminContentManager from "./components/AdminContentManager";
+import AdminContentManager from "./components/Dashboard/AdminContentManager";
 import DashboardOverview from "./components/Dashboard/DashboardOverview";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
