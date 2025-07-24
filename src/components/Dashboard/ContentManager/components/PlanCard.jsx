@@ -12,23 +12,23 @@ const getPlanTypeLabel = (planType) => {
   return labels[planType] || planType;
 };
 
-const FeaturesList = ({ features, iconColor, maxVisible = 3 }) => {
+const FeaturesList = ({ features, maxVisible = 3 }) => {
   if (!features || features.length === 0) return null;
 
   return (
     <div className="mt-4">
-      <h4 className="font-medium text-gray-800 mb-2">المميزات:</h4>
+      <h4 className="font-semibold text-gray-700 mb-3">المميزات:</h4>
       <div className="flex flex-wrap gap-2">
         {features.slice(0, maxVisible).map((feature, index) => (
           <span
             key={index}
-            className={`text-${iconColor} bg-green-50 px-2 py-1 rounded text-xs`}
+            className="text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-lg text-sm font-medium shadow-sm"
           >
             ✓ {feature}
           </span>
         ))}
         {features.length > maxVisible && (
-          <span className="text-gray-500 text-xs px-2 py-1">
+          <span className="text-gray-600 text-sm px-3 py-1 border border-gray-300 rounded-lg bg-gray-50">
             +{features.length - maxVisible} مميزات أخرى
           </span>
         )}
@@ -38,64 +38,74 @@ const FeaturesList = ({ features, iconColor, maxVisible = 3 }) => {
 };
 
 const StylePreview = ({ plan }) => (
-  <div className="mt-4 p-3 border border-gray-200 rounded bg-white">
-    <h4 className="font-medium text-gray-800 mb-2">معاينة التصميم:</h4>
-    <div className="flex gap-4 text-xs">
-      <div>
-        <span className="font-medium">لون السعر:</span>
-        <span className={`text-${plan.price_color} ml-1`}>نموذج</span>
-      </div>
-      <div>
-        <span className="font-medium">لون الأيقونات:</span>
-        <span className={`text-${plan.icon_color} ml-1`}>✓</span>
-      </div>
-      <div>
-        <span className="font-medium">تدرج الزر:</span>
-        <span
-          className={`bg-gradient-to-r from-${plan.button_gradient_from} to-${plan.button_gradient_to} text-white px-2 py-1 rounded ml-1 text-xs`}
-        >
-          {plan.button_text}
+  <div className="mt-4 p-4 border border-gray-200 rounded-xl bg-gray-50/50">
+    <h4 className="font-semibold text-gray-700 mb-3">معاينة التصميم:</h4>
+    <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className="flex items-center space-x-2">
+        <span className="text-gray-600">لون السعر:</span>
+        <div
+          className={`w-4 h-4 rounded-full bg-${plan.price_color}-500`}
+        ></div>
+        <span className={`text-${plan.price_color}-600 font-semibold`}>
+          نموذج
         </span>
+      </div>
+      <div className="flex items-center space-x-2">
+        <span className="text-gray-600">لون الأيقونات:</span>
+        <div className={`w-4 h-4 rounded-full bg-${plan.icon_color}-500`}></div>
+        <span className={`text-${plan.icon_color}-600`}>✓</span>
       </div>
     </div>
   </div>
 );
 
 const PlanInfo = ({ plan }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
-    <div>
-      <span className="font-medium">السعر:</span>
-      <span className={`text-${plan.price_color} font-bold ml-1`}>
-        {plan.currency}
-        {plan.price} {plan.duration_text}
-      </span>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+    <div className="space-y-3">
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">السعر:</span>
+        <span className={`text-${plan.price_color}-600 font-bold`}>
+          {plan.currency}
+          {plan.price} {plan.duration_text}
+        </span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">النوع:</span>
+        <span className="text-gray-800 font-semibold">
+          {getPlanTypeLabel(plan.plan_type)}
+        </span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">الفئة:</span>
+        <span className="text-gray-700">
+          {plan.plan_category === "regular" ? "عادية" : "خاصة"}
+        </span>
+      </div>
     </div>
-    <div>
-      <span className="font-medium">النوع:</span>
-      <span className="ml-1">{getPlanTypeLabel(plan.plan_type)}</span>
-    </div>
-    <div>
-      <span className="font-medium">الفئة:</span>
-      <span className="ml-1">
-        {plan.plan_category === "regular" ? "عادية" : "خاصة"}
-      </span>
-    </div>
-    <div>
-      <span className="font-medium">ترتيب العرض:</span>
-      <span className="ml-1">{plan.order}</span>
-    </div>
-    <div>
-      <span className="font-medium">نص الزر:</span>
-      <span className="ml-1">{plan.button_text}</span>
-    </div>
-    <div>
-      <span className="font-medium">لون الخلفية:</span>
-      <div className="inline-flex items-center gap-1 ml-1">
-        <div
-          className="w-4 h-4 border border-gray-300 rounded"
-          style={{ backgroundColor: plan.background_color }}
-        ></div>
-        <span className="text-xs">{plan.background_color}</span>
+    <div className="space-y-3">
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">ترتيب العرض:</span>
+        <span className="text-gray-700">{plan.order}</span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">نص الزر:</span>
+        <span className="text-gray-700">{plan.button_text}</span>
+      </div>
+      <div className="flex items-center space-x-3">
+        <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+        <span className="text-gray-600 font-medium">لون الخلفية:</span>
+        <div className="flex items-center space-x-2">
+          <div
+            className="w-4 h-4 border border-gray-300 rounded"
+            style={{ backgroundColor: plan.background_color }}
+          ></div>
+          <span className="text-xs text-gray-500">{plan.background_color}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -109,50 +119,49 @@ export const PlanCard = ({ plan, onEdit, onDelete, loading }) => {
   };
 
   return (
-    <div
-      className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow"
-      style={{
-        backgroundColor: plan.background_color || "#ffffff",
-      }}
-    >
-      <div className="flex justify-between items-start mb-4">
+    <div className="space-y-6">
+      <div className="flex justify-between items-start">
         <div className="flex-1">
           {/* Plan Header */}
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-xl font-bold text-gray-900">
+          <div className="flex items-center gap-3 mb-4">
+            <h3 className="text-2xl font-bold text-gray-800">
               {plan.name_arabic}
             </h3>
             {plan.badge_text && (
-              <span
-                className={`text-${plan.price_color} bg-blue-100 px-3 py-1 rounded-full text-sm font-medium`}
-              >
+              <span className="bg-blue-100 border border-blue-200 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium">
                 {plan.badge_text}
               </span>
             )}
             {!plan.is_active && (
-              <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-red-100 border border-red-200 text-red-700 px-3 py-1 rounded-lg text-sm font-medium">
                 غير نشطة
               </span>
             )}
           </div>
 
           <PlanInfo plan={plan} />
-          <FeaturesList features={plan.features} iconColor={plan.icon_color} />
+          <FeaturesList features={plan.features} />
           <StylePreview plan={plan} />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col gap-2 ml-4">
-          <Button size="sm" onClick={() => onEdit(plan)} disabled={loading}>
-            تعديل
+        <div className="flex flex-col gap-3 ml-6 shrink-0">
+          <Button
+            size="sm"
+            onClick={() => onEdit(plan)}
+            disabled={loading}
+            className="hover:scale-110 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 min-w-[80px]"
+          >
+            ✏️ تعديل
           </Button>
           <Button
             variant="danger"
             size="sm"
             onClick={handleDelete}
             disabled={loading}
+            className="hover:scale-110 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 min-w-[80px]"
           >
-            حذف
+            🗑️ حذف
           </Button>
         </div>
       </div>

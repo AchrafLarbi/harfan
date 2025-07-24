@@ -1,23 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   FaHome,
   FaEdit,
   FaCog,
   FaSignOutAlt,
   FaTimes,
-  FaBook,
   FaComments,
   FaPlus,
   FaChevronUp,
-  FaLanguage,
 } from "react-icons/fa";
 import { authAPI } from "../../services/api";
-import logo from "../../assets/logo/logo.png";
+import { selectUser } from "../../store/slices/authSlice";
+import logo from "../../assets/logo/logo2.png";
 
 const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [adminProfile, setAdminProfile] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "admin",
+  });
+
   const navigate = useNavigate();
+  const user = useSelector(selectUser);
+
+  // Get admin profile from Redux or localStorage
+  useEffect(() => {
+    if (user) {
+      setAdminProfile({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        role: user.role || "admin",
+      });
+    } else {
+      // Fallback to localStorage if Redux state is not available
+      const storedUser = localStorage.getItem("harfan_user");
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setAdminProfile({
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          email: userData.email || "",
+          role: userData.role || "admin",
+        });
+      }
+    }
+  }, [user]);
+
+  // Generate initials from first name and last name
+  const getInitials = () => {
+    const firstName = adminProfile.firstName || "";
+    const lastName = adminProfile.lastName || "";
+
+    if (firstName && lastName) {
+      return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    } else if (firstName) {
+      return firstName.charAt(0).toUpperCase();
+    } else if (lastName) {
+      return lastName.charAt(0).toUpperCase();
+    }
+    return "A"; // Default fallback
+  };
+
+  // Get display name
+  const getDisplayName = () => {
+    const firstName = adminProfile.firstName || "";
+    const lastName = adminProfile.lastName || "";
+
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    } else if (firstName) {
+      return firstName;
+    } else if (lastName) {
+      return lastName;
+    } else if (adminProfile.email) {
+      return adminProfile.email;
+    }
+    return "المدير"; // Default fallback
+  };
+
+  // Get role display name in Arabic
+  const getRoleDisplayName = () => {
+    switch (adminProfile.role) {
+      case "admin":
+        return "المدير";
+      case "teacher":
+        return "معلم";
+      case "student":
+        return "طالب";
+      default:
+        return "المدير";
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -34,22 +112,6 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
       name: "الرئيسية",
       icon: FaHome,
       path: "/admin/dashboard",
-    },
-    {
-      id: "language",
-      name: "اللغة العربية",
-      icon: FaLanguage,
-      hasSubmenu: true,
-      submenu: [
-        { name: "العربية هويتي", path: "/admin/arabic-identity" },
-        { name: "العربي الفصيح", path: "/admin/arabic-classic" },
-      ],
-    },
-    {
-      id: "quran",
-      name: "القرآن الكريم",
-      icon: FaBook,
-      path: "/admin/quran",
     },
     {
       id: "conversations",
@@ -77,14 +139,6 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
     },
   ];
 
-  // Mock users for the sidebar (replace with real data)
-  const recentUsers = [
-    { name: "الغريب محمد اشرف", avatar: "🧑‍💼" },
-    { name: "وراد ساسيبيل", avatar: "👩‍💼" },
-    { name: "براهيمي ايمن", avatar: "👨‍💼" },
-    { name: "وراد اسلام شرف الدين", avatar: "👤" },
-  ];
-
   return (
     <>
       {/* Mobile sidebar overlay */}
@@ -103,11 +157,7 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
         {/* Logo Section */}
         <div className="flex flex-col items-center py-8 px-6 border-b border-slate-700 flex-shrink-0">
           <div className="mb-4">
-            <img src={logo} alt="Harfan Logo" className="h-16 w-auto" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-white text-2xl font-bold mb-1">حرفان</h1>
-            <p className="text-slate-300 text-sm">HARFAN</p>
+            <img src={logo} alt="Harfan Logo" className="h-24 w-auto" />
           </div>
           <button
             onClick={onClose}
@@ -117,16 +167,9 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
           </button>
         </div>
 
-        {/* User Status */}
-        <div className="px-6 py-4 border-b border-slate-700 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-300 text-sm">روابط</span>
-            <div className="flex space-x-1">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            </div>
-          </div>
+        {/* Navigation Menu */}
+        <div className="px-6 py-2 border-b border-slate-700 flex-shrink-0">
+          <span className="text-slate-300 text-sm font-medium">الروابط</span>
         </div>
 
         {/* Navigation - Scrollable */}
@@ -196,33 +239,37 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
           })}
         </nav>
 
-        {/* Recent Users Section */}
-        <div className="border-t border-slate-700 p-4 flex-shrink-0">
-          <div className="space-y-3 max-h-40 overflow-y-auto">
-            {recentUsers.map((user, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center text-sm">
-                    {user.avatar}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-300 truncate">{user.name}</p>
-                </div>
+        {/* Admin Profile */}
+        <div className="px-6 py-4 border-b border-slate-700 flex-shrink-0">
+          <div className="flex items-center space-x-3 space-x-reverse">
+            {/* Profile Picture */}
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-lg">
+                  {getInitials()}
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Logout button */}
-        <div className="border-t border-slate-700 p-4 flex-shrink-0">
-          <button
-            onClick={handleLogout}
-            className="group flex items-center px-4 py-3 text-sm font-medium rounded-lg text-red-400 hover:bg-red-900/20 hover:text-red-300 w-full transition-colors duration-200"
-          >
-            <FaSignOutAlt className="ml-3 flex-shrink-0 h-5 w-5" />
-            تسجيل الخروج
-          </button>
+            {/* Admin Info */}
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-medium text-sm truncate">
+                {getDisplayName()}
+              </p>
+              <p className="text-slate-400 text-xs">{getRoleDisplayName()}</p>
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <div className="mt-4">
+            <button
+              onClick={handleLogout}
+              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-2 space-x-reverse"
+            >
+              <FaSignOutAlt className="h-4 w-4" />
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
         </div>
       </div>
     </>
