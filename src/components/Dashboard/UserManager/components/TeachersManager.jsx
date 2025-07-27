@@ -1,31 +1,106 @@
-import React, { useState, useEffect } from "react";
-import { useUserManager } from "../hooks/useUserManager";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import UserCard from "./UserCard";
 import LoadingSpinner from "./LoadingSpinner";
+import {
+  fetchTeachers,
+  setTeacherFilters,
+  activateUser,
+  selectTeachers,
+  selectTeachersLoading,
+  selectUserManagementError,
+  selectTeacherFilters,
+} from "../../../../store/slices/userManagementSlice";
 
 const TeachersManager = () => {
-  const { teachers, loading, error, fetchTeachers, activateTeacher } =
-    useUserManager();
-  const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
+  const mounted = useRef(false);
+  const searchTimeoutRef = useRef(null);
 
+  // Redux state
+  const teachers = useSelector(selectTeachers);
+  const loading = useSelector(selectTeachersLoading);
+  const error = useSelector(selectUserManagementError);
+  const filters = useSelector(selectTeacherFilters);
+
+  // Initial fetch on mount only
   useEffect(() => {
-    fetchTeachers();
-  }, [fetchTeachers]);
+    if (!mounted.current) {
+      mounted.current = true;
+      dispatch(
+        fetchTeachers({
+          page: 1,
+          search: "",
+          status: "all",
+          approvalStatus: "all",
+          sortBy: "created_at",
+          sortOrder: "desc",
+        })
+      );
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [dispatch]);
+
+  const handleSearchChange = (searchTerm) => {
+    dispatch(setTeacherFilters({ search: searchTerm }));
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Fetch with new search term (debounced)
+    searchTimeoutRef.current = setTimeout(() => {
+      dispatch(
+        fetchTeachers({
+          page: 1,
+          search: searchTerm,
+          status: filters.status,
+          approvalStatus: filters.approvalStatus,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
+        })
+      );
+    }, 300);
+  };
+
+  const handleRetry = () => {
+    dispatch(
+      fetchTeachers({
+        page: 1,
+        search: filters.search,
+        status: filters.status,
+        approvalStatus: filters.approvalStatus,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      })
+    );
+  };
 
   const filteredTeachers = teachers.filter(
     (teacher) =>
-      teacher.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      teacher.first_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      teacher.last_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      teacher.email.toLowerCase().includes(filters.search.toLowerCase()) ||
       (teacher.specialty &&
-        teacher.specialty.toLowerCase().includes(searchTerm.toLowerCase()))
+        teacher.specialty.toLowerCase().includes(filters.search.toLowerCase()))
   );
 
   const handleActivateTeacher = async (teacherId) => {
     try {
-      await activateTeacher(teacherId);
-      // Refresh the teachers list
-      fetchTeachers();
+      await dispatch(
+        activateUser({
+          userId: teacherId,
+          userType: "teacher",
+          activate: true,
+        })
+      ).unwrap();
     } catch (error) {
       console.error("Error activating teacher:", error);
     }
@@ -59,7 +134,7 @@ const TeachersManager = () => {
           </h3>
           <p className="text-gray-500">{error}</p>
           <button
-            onClick={() => fetchTeachers()}
+            onClick={handleRetry}
             className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
           >
             إعادة المحاولة
@@ -114,8 +189,8 @@ const TeachersManager = () => {
           <input
             type="text"
             placeholder="البحث عن أستاذ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.search}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
@@ -143,7 +218,7 @@ const TeachersManager = () => {
             لا توجد أساتذة
           </h3>
           <p className="text-gray-500">
-            {searchTerm
+            {filters.search
               ? "لم يتم العثور على أساتذة يطابقون البحث"
               : "لا توجد أساتذة مسجلين حالياً"}
           </p>

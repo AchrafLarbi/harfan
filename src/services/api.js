@@ -15,6 +15,15 @@ import {
   apiCallSuccess,
   apiCallFailure,
 } from "../store/slices/apiSlice";
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
+  storeAccessTokenInStorage,
+  clearAccessTokenFromStorage,
+  isTokenExpired,
+  refreshAccessToken,
+} from "../utils/tokenUtils";
 
 // API Configuration
 const API_CONFIG = {
@@ -44,10 +53,35 @@ export const decodeJWT = (token) => {
   }
 };
 
-// Helper function to get auth token
-const getAuthToken = () => {
-  const state = store.getState();
-  return state.auth.token;
+// Helper function to get auth token with automatic refresh
+const getAuthToken = async () => {
+  let token = getAccessToken();
+
+  // If no token in memory, try to get from Redux store
+  if (!token) {
+    const state = store.getState();
+    token = state.auth.token;
+    if (token) {
+      setAccessToken(token);
+    }
+  }
+
+  // Check if token is expired and refresh if needed
+  if (token && isTokenExpired(token)) {
+    try {
+      token = await refreshAccessToken();
+    } catch (error) {
+      console.error("Failed to refresh token:", error);
+      // Clear all auth data if refresh fails
+      clearAccessToken();
+      clearAccessTokenFromStorage();
+      const { dispatch } = store;
+      dispatch({ type: "auth/logout" });
+      return null;
+    }
+  }
+
+  return token;
 };
 
 // Helper function to create API URL
@@ -62,7 +96,7 @@ const apiCall = async (endpoint, options = {}) => {
   try {
     dispatch(apiCallStart());
 
-    const token = getAuthToken();
+    const token = await getAuthToken();
     const url = createApiUrl(endpoint);
 
     // Public endpoints that don't require authentication
@@ -72,12 +106,14 @@ const apiCall = async (endpoint, options = {}) => {
       "/verify-email",
       "/auth/request-reset-password/",
       "/auth/reset-password/",
+      "/auth/token/refresh/",
     ];
     const isPublicEndpoint = publicEndpoints.some((publicEndpoint) =>
       endpoint.startsWith(publicEndpoint)
     );
 
     const defaultOptions = {
+      credentials: "include", // Include cookies for refresh token
       headers: {
         // Only set Content-Type for non-FormData requests
         ...(!(options.body instanceof FormData) && {
@@ -99,6 +135,47 @@ const apiCall = async (endpoint, options = {}) => {
 
     const response = await fetch(url, mergedOptions);
     const data = await response.json();
+
+    // Handle 401 Unauthorized responses (token expired)
+    if (response.status === 401 && !isPublicEndpoint) {
+      try {
+        // Try to refresh the token
+        const newToken = await refreshAccessToken();
+
+        if (newToken) {
+          // Retry the request with the new token
+          const retryOptions = {
+            ...mergedOptions,
+            headers: {
+              ...mergedOptions.headers,
+              Authorization: `Bearer ${newToken}`,
+            },
+          };
+
+          const retryResponse = await fetch(url, retryOptions);
+          const retryData = await retryResponse.json();
+
+          if (!retryResponse.ok) {
+            throw new Error(
+              retryData.detail ||
+                retryData.message ||
+                "API call failed after retry"
+            );
+          }
+
+          dispatch(apiCallSuccess());
+          return retryData;
+        }
+      } catch (refreshError) {
+        console.error("Token refresh failed during API call:", refreshError);
+        // Clear auth data and logout user
+        clearAccessToken();
+        clearAccessTokenFromStorage();
+        localStorage.removeItem("harfan_user");
+        dispatch({ type: "auth/logout" });
+        throw new Error("Authentication failed. Please log in again.");
+      }
+    }
 
     if (!response.ok) {
       throw new Error(data.detail || data.message || "API call failed");
@@ -123,6 +200,7 @@ export const authAPI = {
 
       const response = await apiCall("/auth/login", {
         method: "POST",
+        credentials: "include", // Important: This allows setting httpOnly cookies
         body: JSON.stringify({
           email: credentials.email,
           password: credentials.password,
@@ -149,9 +227,11 @@ export const authAPI = {
         );
       }
 
-      // Store token in localStorage
-      localStorage.setItem("harfan_token", response.access);
-      localStorage.setItem("harfan_refresh_token", response.refresh);
+      // Store access token securely
+      setAccessToken(response.access);
+      storeAccessTokenInStorage(response.access);
+
+      // Store user info (but NOT refresh token in localStorage)
       localStorage.setItem(
         "harfan_user",
         JSON.stringify({
@@ -294,18 +374,31 @@ export const authAPI = {
     const { dispatch } = store;
 
     try {
-      // Django JWT doesn't require server-side logout for stateless tokens
-      // Just clear localStorage and Redux state
-      localStorage.removeItem("harfan_token");
-      localStorage.removeItem("harfan_refresh_token");
+      // Clear access token from memory and storage
+      clearAccessToken();
+      clearAccessTokenFromStorage();
       localStorage.removeItem("harfan_user");
+
+      // Make logout request to clear httpOnly refresh token cookie
+      try {
+        await apiCall("/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (logoutError) {
+        // Continue with client-side logout even if server logout fails
+        console.warn(
+          "Server logout failed, continuing with client logout:",
+          logoutError
+        );
+      }
 
       dispatch({ type: "auth/logout" });
     } catch (error) {
       console.error("Logout error:", error);
-      // Clear localStorage even if there's an error
-      localStorage.removeItem("harfan_token");
-      localStorage.removeItem("harfan_refresh_token");
+      // Clear all auth data even if there's an error
+      clearAccessToken();
+      clearAccessTokenFromStorage();
       localStorage.removeItem("harfan_user");
       dispatch({ type: "auth/logout" });
     }
@@ -328,23 +421,29 @@ export const authAPI = {
   // Refresh token
   refreshToken: async () => {
     try {
-      const refreshToken = localStorage.getItem("harfan_refresh_token");
-      if (!refreshToken) {
-        throw new Error("No refresh token available");
+      const newAccessToken = await refreshAccessToken();
+
+      // Update Redux store with new token
+      const { dispatch } = store;
+      const state = store.getState();
+      if (state.auth.user) {
+        dispatch(
+          loginSuccess({
+            user: state.auth.user,
+            token: newAccessToken,
+          })
+        );
       }
 
-      const response = await apiCall("/auth/token/refresh/", {
-        method: "POST",
-        body: JSON.stringify({
-          refresh: refreshToken,
-        }),
-      });
-
-      localStorage.setItem("harfan_token", response.access);
-
-      return response.access;
+      return newAccessToken;
     } catch (error) {
       console.error("Token refresh failed:", error);
+      // Clear all auth data and logout user
+      const { dispatch } = store;
+      clearAccessToken();
+      clearAccessTokenFromStorage();
+      localStorage.removeItem("harfan_user");
+      dispatch({ type: "auth/logout" });
       throw error;
     }
   },
@@ -462,21 +561,52 @@ export const restoreUserSession = () => {
 
     if (token && userStr) {
       const user = JSON.parse(userStr);
-      dispatch(loginSuccess({ user, token }));
+
+      // Check if token is still valid
+      if (!isTokenExpired(token)) {
+        setAccessToken(token);
+        dispatch(loginSuccess({ user, token }));
+      } else {
+        // Token is expired, clear it and try to refresh
+        clearAccessTokenFromStorage();
+        localStorage.removeItem("harfan_user");
+
+        // Attempt to refresh token using httpOnly cookie
+        refreshAccessToken()
+          .then((newToken) => {
+            if (newToken) {
+              setAccessToken(newToken);
+              storeAccessTokenInStorage(newToken);
+              // Restore user data
+              localStorage.setItem("harfan_user", userStr);
+              dispatch(loginSuccess({ user, token: newToken }));
+            }
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to refresh token during session restore:",
+              error
+            );
+            // Clear all auth data
+            clearAccessToken();
+            clearAccessTokenFromStorage();
+            localStorage.removeItem("harfan_user");
+          });
+      }
     }
   } catch (error) {
     console.error("Failed to restore user session:", error);
     // Clear corrupted localStorage
-    localStorage.removeItem("harfan_token");
-    localStorage.removeItem("harfan_refresh_token");
+    clearAccessToken();
+    clearAccessTokenFromStorage();
     localStorage.removeItem("harfan_user");
   }
 };
 
 // Helper to clear all authentication data
 export const clearAuthData = () => {
-  localStorage.removeItem("harfan_token");
-  localStorage.removeItem("harfan_refresh_token");
+  clearAccessToken();
+  clearAccessTokenFromStorage();
   localStorage.removeItem("harfan_user");
 
   const { dispatch } = store;
@@ -505,4 +635,22 @@ const formatDateToDjango = (dateString) => {
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
+};
+
+// Initialize app authentication on startup
+export const initializeAuth = () => {
+  // Try to restore session from localStorage
+  restoreUserSession();
+
+  // Set up periodic token refresh check (every 4 minutes)
+  setInterval(async () => {
+    const token = getAccessToken();
+    if (token && isTokenExpired(token)) {
+      try {
+        await authAPI.refreshToken();
+      } catch (error) {
+        console.error("Periodic token refresh failed:", error);
+      }
+    }
+  }, 240000); // 4 minutes
 };

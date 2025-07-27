@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
 import Landing from "./components/Landing";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
@@ -13,14 +12,7 @@ import TeachersPage from "./components/Dashboard/TeachersPage";
 
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
-import { restoreUserSession } from "./services/api";
-
 export default function App() {
-  useEffect(() => {
-    // Restore user session from localStorage when app loads
-    restoreUserSession();
-  }, []);
-
   return (
     <Router>
       <Routes>

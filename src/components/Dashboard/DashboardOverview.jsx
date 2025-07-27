@@ -1,37 +1,82 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { FaUsers, FaEdit, FaEye, FaChartLine } from "react-icons/fa";
 import DashboardLayout from "./DashboardLayout";
+import {
+  fetchDashboardStats,
+  fetchRecentActivities,
+  setMockData,
+  selectDashboardStats,
+  selectRecentActivities,
+  selectStatsLoading,
+  selectTimePeriod,
+  selectLastUpdated,
+} from "../../store/slices/dashboardSlice";
+import {
+  updateActivity,
+  selectAdminSessionInfo,
+} from "../../store/slices/adminSlice";
 
 const DashboardOverview = () => {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalContent: 0,
-    totalViews: 0,
-    growthRate: 0,
-  });
+  const dispatch = useDispatch();
+
+  // Redux state
+  const stats = useSelector(selectDashboardStats);
+  const recentActivities = useSelector(selectRecentActivities);
+  const isLoading = useSelector(selectStatsLoading);
+  const timePeriod = useSelector(selectTimePeriod);
+  const lastUpdated = useSelector(selectLastUpdated);
+  const sessionInfo = useSelector(selectAdminSessionInfo);
 
   useEffect(() => {
-    // Mock data - you can replace this with actual API calls
-    setStats({
-      totalUsers: 1250,
-      totalContent: 15,
-      totalViews: 8430,
-      growthRate: 12.5,
-    });
-  }, []);
+    // Update admin activity
+    dispatch(updateActivity());
+
+    // Try to fetch real data, fallback to mock data
+    dispatch(fetchDashboardStats(timePeriod))
+      .unwrap()
+      .catch(() => {
+        // If API fails, use mock data for development
+        dispatch(setMockData());
+      });
+
+    // Fetch recent activities
+    dispatch(fetchRecentActivities(10))
+      .unwrap()
+      .catch(() => {
+        // Mock activities are already set in setMockData
+        console.log("Using mock activities data");
+      });
+  }, [dispatch, timePeriod]);
 
   const statCards = [
     {
       title: "إجمالي المستخدمين",
-      value: stats.totalUsers.toLocaleString(),
+      value: (stats.totalUsers || 0).toLocaleString(),
       icon: FaUsers,
       change: "+12%",
       changeType: "positive",
       color: "blue",
     },
     {
+      title: "إجمالي الطلاب",
+      value: (stats.totalStudents || 0).toLocaleString(),
+      icon: FaUsers,
+      change: `+${stats.newRegistrations || 0}`,
+      changeType: "positive",
+      color: "green",
+    },
+    {
+      title: "إجمالي الأساتذة",
+      value: (stats.totalTeachers || 0).toLocaleString(),
+      icon: FaUsers,
+      change: "+5",
+      changeType: "positive",
+      color: "purple",
+    },
+    {
       title: "محتوى الموقع",
-      value: stats.totalContent,
+      value: stats.totalContent || 0,
       icon: FaEdit,
       change: "+3",
       changeType: "positive",
@@ -39,14 +84,15 @@ const DashboardOverview = () => {
     },
     {
       title: "مشاهدات الصفحة",
-      value: stats.totalViews.toLocaleString(),
+      value: (stats.totalViews || 0).toLocaleString(),
+      icon: FaEye,
       change: "+8.2%",
       changeType: "positive",
       color: "purple",
     },
     {
       title: "معدل النمو",
-      value: `${stats.growthRate}%`,
+      value: `${stats.growthRate || 0}%`,
       icon: FaChartLine,
       change: "+2.1%",
       changeType: "positive",
@@ -182,28 +228,69 @@ const DashboardOverview = () => {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            النشاط الأخير
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center text-sm">
-              <div className="flex-shrink-0 h-2 w-2 bg-green-400 rounded-full"></div>
-              <p className="mr-3 text-gray-600">
-                تم تحديث محتوى قسم "من نحن" بنجاح
-              </p>
-              <span className="mr-auto text-gray-400">منذ 5 دقائق</span>
-            </div>
-            <div className="flex items-center text-sm">
-              <div className="flex-shrink-0 h-2 w-2 bg-blue-400 rounded-full"></div>
-              <p className="mr-3 text-gray-600">تسجيل مستخدم جديد: أحمد محمد</p>
-              <span className="mr-auto text-gray-400">منذ 15 دقيقة</span>
-            </div>
-            <div className="flex items-center text-sm">
-              <div className="flex-shrink-0 h-2 w-2 bg-yellow-400 rounded-full"></div>
-              <p className="mr-3 text-gray-600">تم تحديث خطة الاشتراك الشهري</p>
-              <span className="mr-auto text-gray-400">منذ ساعة</span>
-            </div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900">النشاط الأخير</h3>
+            {lastUpdated && (
+              <span className="text-xs text-gray-500">
+                آخر تحديث: {new Date(lastUpdated).toLocaleString("ar-SA")}
+              </span>
+            )}
           </div>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <span className="mr-3 text-gray-500">جاري التحميل...</span>
+            </div>
+          ) : recentActivities && recentActivities.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivities.slice(0, 5).map((activity, index) => (
+                <div
+                  key={activity.id || index}
+                  className="flex items-center text-sm"
+                >
+                  <div
+                    className={`flex-shrink-0 h-2 w-2 rounded-full ${
+                      activity.type === "user_registration"
+                        ? "bg-blue-400"
+                        : activity.type === "content_update"
+                        ? "bg-green-400"
+                        : activity.type === "plan_update"
+                        ? "bg-yellow-400"
+                        : "bg-gray-400"
+                    }`}
+                  ></div>
+                  <p className="mr-3 text-gray-600">{activity.message}</p>
+                  <span className="mr-auto text-gray-400">
+                    {activity.timestamp
+                      ? new Date(activity.timestamp).toLocaleString("ar-SA", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : "الآن"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>لا توجد أنشطة حديثة</p>
+            </div>
+          )}
+
+          {sessionInfo?.activityCount > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-500">
+                جلسة العمل الحالية: {sessionInfo.activityCount} نشاط
+                {sessionInfo.lastActivity &&
+                  ` • آخر نشاط: ${new Date(
+                    sessionInfo.lastActivity
+                  ).toLocaleTimeString("ar-SA")}`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

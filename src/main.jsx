@@ -6,7 +6,12 @@ import "./index.css";
 import App from "./App.jsx";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { initializeAuth } from "./services/api";
+
 AOS.init({ once: false });
+
+// Initialize authentication system
+initializeAuth();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

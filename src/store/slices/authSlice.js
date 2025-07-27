@@ -72,27 +72,21 @@ const authSlice = createSlice({
       state.error = null;
     },
 
-    // Update user profile
-    updateProfileStart: (state) => {
-      state.isLoading = true;
-      state.error = null;
-    },
-    updateProfileSuccess: (state, action) => {
-      state.isLoading = false;
-      state.user = { ...state.user, ...action.payload };
-      state.error = null;
-    },
-    updateProfileFailure: (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-
     // Set user from stored token (for app initialization)
     setUser: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.role = action.payload.user.role;
+    },
+
+    // Initialize admin session (for admin users)
+    initializeAdminSession: (state) => {
+      // This action is handled by extraReducers in adminSlice
+      // but we track it here for consistency
+      if (state.user && (state.user.is_staff || state.user.is_superuser)) {
+        // Admin user authenticated
+      }
     },
   },
 });
@@ -110,6 +104,7 @@ export const {
   updateProfileSuccess,
   updateProfileFailure,
   setUser,
+  initializeAdminSession,
 } = authSlice.actions;
 
 export default authSlice.reducer;

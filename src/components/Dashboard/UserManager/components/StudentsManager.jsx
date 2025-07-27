@@ -1,21 +1,89 @@
-import React, { useState, useEffect } from "react";
-import { useUserManager } from "../hooks/useUserManager";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import UserCard from "./UserCard";
 import LoadingSpinner from "./LoadingSpinner";
+import {
+  fetchStudents,
+  setStudentFilters,
+  selectStudents,
+  selectStudentsLoading,
+  selectUserManagementError,
+  selectStudentFilters,
+} from "../../../../store/slices/userManagementSlice";
 
 const StudentsManager = () => {
-  const { students, loading, error, fetchStudents } = useUserManager();
-  const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
+  const mounted = useRef(false);
+  const searchTimeoutRef = useRef(null);
 
+  // Redux state
+  const students = useSelector(selectStudents);
+  const loading = useSelector(selectStudentsLoading);
+  const error = useSelector(selectUserManagementError);
+  const filters = useSelector(selectStudentFilters);
+
+  // Initial fetch on mount only
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    if (!mounted.current) {
+      mounted.current = true;
+      dispatch(
+        fetchStudents({
+          page: 1,
+          search: "",
+          status: "all",
+          sortBy: "created_at",
+          sortOrder: "desc",
+        })
+      );
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [dispatch]);
+
+  const handleSearchChange = (searchTerm) => {
+    dispatch(setStudentFilters({ search: searchTerm }));
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Fetch with new search term (debounced)
+    searchTimeoutRef.current = setTimeout(() => {
+      dispatch(
+        fetchStudents({
+          page: 1,
+          search: searchTerm,
+          status: filters.status,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
+        })
+      );
+    }, 300);
+  };
+
+  const handleRetry = () => {
+    dispatch(
+      fetchStudents({
+        page: 1,
+        search: filters.search,
+        status: filters.status,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      })
+    );
+  };
 
   const filteredStudents = students.filter(
     (student) =>
-      student.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+      student.first_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      student.last_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      student.email.toLowerCase().includes(filters.search.toLowerCase())
   );
 
   if (loading) {
@@ -46,7 +114,7 @@ const StudentsManager = () => {
           </h3>
           <p className="text-gray-500">{error}</p>
           <button
-            onClick={() => fetchStudents()}
+            onClick={handleRetry}
             className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
           >
             إعادة المحاولة
@@ -86,8 +154,8 @@ const StudentsManager = () => {
           <input
             type="text"
             placeholder="البحث عن طالب..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.search}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
@@ -115,7 +183,7 @@ const StudentsManager = () => {
             لا توجد طلاب
           </h3>
           <p className="text-gray-500">
-            {searchTerm
+            {filters.search
               ? "لم يتم العثور على طلاب يطابقون البحث"
               : "لا توجد طلاب مسجلين حالياً"}
           </p>
