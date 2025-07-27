@@ -1,0 +1,16 @@
+import React from "react";
+
+const LoadingSpinner = () => {
+  return (
+    <div className="p-6">
+      <div className="flex justify-center items-center py-12">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <p className="mt-4 text-gray-600">جاري التحميل...</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoadingSpinner;

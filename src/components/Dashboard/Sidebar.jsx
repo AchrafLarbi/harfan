@@ -10,6 +10,8 @@ import {
   FaComments,
   FaPlus,
   FaChevronUp,
+  FaUserGraduate,
+  FaChalkboardTeacher,
 } from "react-icons/fa";
 import { authAPI } from "../../services/api";
 import { selectUser } from "../../store/slices/authSlice";
@@ -114,28 +116,28 @@ const Sidebar = ({ isOpen, onClose, activeTab = "content" }) => {
       path: "/admin/dashboard",
     },
     {
-      id: "conversations",
-      name: "المحادثات",
-      icon: FaComments,
-      path: "/admin/conversations",
-    },
-    {
       id: "content",
       name: "إدارة المحتوى",
       icon: FaEdit,
       path: "/admin/content",
     },
     {
+      id: "students",
+      name: "إدارة الطلاب",
+      icon: FaUserGraduate,
+      path: "/admin/students",
+    },
+    {
+      id: "teachers",
+      name: "إدارة الأساتذة",
+      icon: FaChalkboardTeacher,
+      path: "/admin/teachers",
+    },
+    {
       id: "settings",
       name: "إعدادات",
       icon: FaCog,
       path: "/admin/settings",
-    },
-    {
-      id: "shortcuts",
-      name: "اختصارات",
-      icon: FaPlus,
-      path: "/admin/shortcuts",
     },
   ];
 

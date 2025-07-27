@@ -27,6 +27,14 @@ const DashboardLayout = ({ children, activeTab = "content" }) => {
       name: "إدارة المحتوى",
     },
     {
+      id: "students",
+      name: "إدارة الطلاب",
+    },
+    {
+      id: "teachers",
+      name: "إدارة الأساتذة",
+    },
+    {
       id: "settings",
       name: "إعدادات",
     },

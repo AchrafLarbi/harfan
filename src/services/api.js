@@ -19,7 +19,7 @@ import {
 // API Configuration
 const API_CONFIG = {
   // Django backend URL
-  baseURL: "https://0vrkzhm5-8000.uks1.devtunnels.ms", // Django default port
+  baseURL: "https://0vrkzhm5-8000.uks1.devtunnels.ms/", // Django default port
   version: "v1",
   timeout: 10000,
 };
