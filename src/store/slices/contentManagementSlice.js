@@ -3,192 +3,169 @@ import { contentService } from "../../services/contentApi";
 
 // Initial state for content management
 const initialState = {
-  // Landing page content
-  landingPage: {
-    hero: null,
-    about: null,
-    features: null,
-    testimonials: null,
-    plans: null,
-    contact: null,
-  },
+  // Content data
+  content: null,
+  plans: [],
 
-  // Plans management
-  plans: {
-    all: [],
-    byCategory: {},
-    categories: ["student", "teacher"],
-  },
-
-  // Content editing
-  editingContent: {
-    isEditing: false,
-    contentType: null, // 'section', 'plan'
-    contentId: null,
-    originalData: null,
-    hasChanges: false,
-  },
-
-  // File uploads
-  uploads: {
-    isUploading: false,
-    progress: 0,
-    uploadedFiles: [],
-  },
+  // Cache metadata
+  lastFetched: null,
+  cacheExpiry: 5 * 60 * 1000, // 5 minutes in milliseconds
 
   // Loading states
   isLoading: false,
-  sectionsLoading: false,
-  plansLoading: false,
-  saveLoading: false,
+  actionLoading: false,
 
-  // Error states
+  // Error and success states
   error: null,
+  success: null,
 
-  // Content history and versioning
-  contentHistory: [],
-
-  // Preview mode
-  previewMode: false,
-  previewData: null,
-
-  // Content statistics
-  contentStats: {
-    totalSections: 0,
-    totalPlans: 0,
-    lastUpdated: null,
-    totalViews: 0,
-  },
+  // UI state
+  editingSection: null,
 };
 
-// Async thunks for content management
-export const fetchLandingPageContent = createAsyncThunk(
-  "contentManagement/fetchLandingPage",
-  async (_, { rejectWithValue }) => {
+// Async thunks for content operations
+export const fetchContentAndPlans = createAsyncThunk(
+  "contentManagement/fetchContentAndPlans",
+  async (forceRefresh = false, { getState, rejectWithValue }) => {
     try {
-      const data = await contentService.getLandingPageContent();
-      return data;
-    } catch (error) {
-      return rejectWithValue(
-        error.message || "خطأ في تحميل محتوى الصفحة الرئيسية"
-      );
-    }
-  }
-);
+      const state = getState();
+      const { lastFetched, cacheExpiry, content, plans } =
+        state.contentManagement;
 
-export const fetchAboutContent = createAsyncThunk(
-  "contentManagement/fetchAbout",
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await contentService.getAboutContent();
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.message || "خطأ في تحميل محتوى صفحة من نحن");
-    }
-  }
-);
+      // Check if we have cached data and it's still fresh (unless forced refresh)
+      if (!forceRefresh && content && plans.length > 0 && lastFetched) {
+        const now = Date.now();
+        const timeSinceLastFetch = now - lastFetched;
 
-export const fetchPlansContent = createAsyncThunk(
-  "contentManagement/fetchPlans",
-  async (_, { rejectWithValue }) => {
-    try {
-      const [allPlans, plansByCategory] = await Promise.all([
+        if (timeSinceLastFetch < cacheExpiry) {
+          // Return cached data
+          return { content, plans, fromCache: true };
+        }
+      }
+
+      // Fetch fresh data
+      const [contentData, plansData] = await Promise.all([
+        contentService.getLandingPageContent(),
         contentService.getAllPlans(),
-        contentService.getPlansByCategory(),
       ]);
 
-      return { allPlans, plansByCategory };
+      return {
+        content: contentData,
+        plans: plansData,
+        fromCache: false,
+        timestamp: Date.now(),
+      };
     } catch (error) {
-      return rejectWithValue(error.message || "خطأ في تحميل الخطط");
+      console.error("Error fetching content:", error);
+      return rejectWithValue(
+        error.response?.data?.detail || error.message || "فشل في تحميل المحتوى"
+      );
     }
   }
 );
 
-export const updateLandingPageSection = createAsyncThunk(
+export const updateSection = createAsyncThunk(
   "contentManagement/updateSection",
-  async ({ sectionId, data, token }, { rejectWithValue }) => {
+  async ({ sectionType, sectionData }, { getState, rejectWithValue }) => {
     try {
-      const response = await contentService.updateLandingPageSection(
+      const state = getState();
+      const { token } = state.auth;
+      const { content } = state.contentManagement;
+
+      let sectionId, updateData;
+      if (sectionType === "about") {
+        sectionId = content.about.id;
+        updateData = {
+          section_type: "about",
+          about_title_main: sectionData.title_main,
+          about_title_highlighted: sectionData.title_highlighted,
+          about_title_secondary: sectionData.title_secondary,
+          about_description: sectionData.description,
+          about_badge_text: sectionData.badge_text,
+        };
+      } else if (sectionType === "plans") {
+        sectionId = content.plans_section.id;
+        updateData = {
+          section_type: "plans",
+          plans_title_main: sectionData.title_main,
+          plans_title_highlighted: sectionData.title_highlighted,
+          plans_title_secondary: sectionData.title_secondary,
+          plans_description: sectionData.description,
+          plans_badge_text: sectionData.badge_text,
+        };
+      }
+
+      const updatedSection = await contentService.updateLandingPageSection(
         sectionId,
-        data,
+        updateData,
         token
       );
-      return { sectionId, data: response };
+
+      return { sectionType, updatedSection };
     } catch (error) {
-      return rejectWithValue(error.message || "خطأ في تحديث المحتوى");
+      console.error("Error updating section:", error);
+      return rejectWithValue(
+        error.response?.data?.detail || error.message || "فشل في حفظ التغييرات"
+      );
     }
   }
 );
 
 export const updatePlan = createAsyncThunk(
   "contentManagement/updatePlan",
-  async ({ planId, data, token }, { rejectWithValue }) => {
+  async (planData, { getState, rejectWithValue }) => {
     try {
-      const response = await contentService.updatePlan(planId, data, token);
-      return { planId, data: response };
+      const state = getState();
+      const { token } = state.auth;
+
+      const updatedPlan = await contentService.updatePlan(
+        planData.id,
+        planData,
+        token
+      );
+
+      return updatedPlan;
     } catch (error) {
-      return rejectWithValue(error.message || "خطأ في تحديث الخطة");
+      console.error("Error updating plan:", error);
+      return rejectWithValue(
+        error.response?.data?.detail || error.message || "فشل في حفظ الخطة"
+      );
     }
   }
 );
 
 export const createPlan = createAsyncThunk(
   "contentManagement/createPlan",
-  async ({ data, token }, { rejectWithValue }) => {
+  async (planData, { getState, rejectWithValue }) => {
     try {
-      const response = await contentService.createPlan(data, token);
-      return response;
+      const state = getState();
+      const { token } = state.auth;
+
+      const createdPlan = await contentService.createPlan(planData, token);
+      return createdPlan;
     } catch (error) {
-      return rejectWithValue(error.message || "خطأ في إنشاء الخطة");
+      console.error("Error creating plan:", error);
+      return rejectWithValue(
+        error.response?.data?.detail || error.message || "فشل في إضافة الخطة"
+      );
     }
   }
 );
 
 export const deletePlan = createAsyncThunk(
   "contentManagement/deletePlan",
-  async ({ planId, token }, { rejectWithValue }) => {
+  async (planId, { getState, rejectWithValue }) => {
     try {
+      const state = getState();
+      const { token } = state.auth;
+
       await contentService.deletePlan(planId, token);
       return planId;
     } catch (error) {
-      return rejectWithValue(error.message || "خطأ في حذف الخطة");
-    }
-  }
-);
-
-export const uploadContentFile = createAsyncThunk(
-  "contentManagement/uploadFile",
-  async ({ file, contentType, contentId }, { rejectWithValue, dispatch }) => {
-    try {
-      // Update progress during upload
-      const onProgress = (progress) => {
-        dispatch(updateUploadProgress(progress));
-      };
-
-      const response = await contentService.uploadFile(
-        file,
-        contentType,
-        contentId,
-        onProgress
+      console.error("Error deleting plan:", error);
+      return rejectWithValue(
+        error.response?.data?.detail || error.message || "فشل في حذف الخطة"
       );
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.message || "خطأ في رفع الملف");
-    }
-  }
-);
-
-export const fetchContentHistory = createAsyncThunk(
-  "contentManagement/fetchHistory",
-  async ({ contentType, contentId }, { rejectWithValue }) => {
-    try {
-      const data = await contentService.getContentHistory(
-        contentType,
-        contentId
-      );
-      return data;
-    } catch (error) {
-      return rejectWithValue(error.message || "خطأ في تحميل تاريخ المحتوى");
     }
   }
 );
@@ -197,342 +174,203 @@ const contentManagementSlice = createSlice({
   name: "contentManagement",
   initialState,
   reducers: {
-    // Content editing
-    startEditing: (state, action) => {
-      const { contentType, contentId, originalData } = action.payload;
-      state.editingContent = {
-        isEditing: true,
-        contentType,
-        contentId,
-        originalData,
-        hasChanges: false,
-      };
+    // Set editing section
+    setEditingSection: (state, action) => {
+      state.editingSection = action.payload;
     },
 
-    stopEditing: (state) => {
-      state.editingContent = {
-        isEditing: false,
-        contentType: null,
-        contentId: null,
-        originalData: null,
-        hasChanges: false,
-      };
+    // Clear editing section
+    clearEditingSection: (state) => {
+      state.editingSection = null;
     },
 
-    markAsChanged: (state) => {
-      state.editingContent.hasChanges = true;
-    },
-
-    discardChanges: (state) => {
-      state.editingContent.hasChanges = false;
-      // Reset to original data logic would go here
-    },
-
-    // Preview mode
-    enablePreviewMode: (state, action) => {
-      state.previewMode = true;
-      state.previewData = action.payload;
-    },
-
-    disablePreviewMode: (state) => {
-      state.previewMode = false;
-      state.previewData = null;
-    },
-
-    // Upload progress
-    updateUploadProgress: (state, action) => {
-      state.uploads.progress = action.payload;
-    },
-
-    startUpload: (state) => {
-      state.uploads.isUploading = true;
-      state.uploads.progress = 0;
-    },
-
-    finishUpload: (state, action) => {
-      state.uploads.isUploading = false;
-      state.uploads.progress = 100;
-      if (action.payload) {
-        state.uploads.uploadedFiles.push(action.payload);
-      }
-    },
-
-    clearUploadedFiles: (state) => {
-      state.uploads.uploadedFiles = [];
-      state.uploads.progress = 0;
-    },
-
-    // Update content stats
-    updateContentStats: (state, action) => {
-      state.contentStats = { ...state.contentStats, ...action.payload };
-    },
-
-    // Clear states
-    clearError: (state) => {
+    // Clear messages
+    clearMessages: (state) => {
       state.error = null;
+      state.success = null;
     },
 
-    clearContentManagement: (state) => {
-      Object.assign(state, initialState);
+    // Force refresh (clear cache)
+    invalidateCache: (state) => {
+      state.lastFetched = null;
     },
 
-    // Local content updates (for optimistic updates)
-    updateLocalSectionContent: (state, action) => {
-      const { sectionType, data } = action.payload;
-      if (state.landingPage[sectionType]) {
-        state.landingPage[sectionType] = {
-          ...state.landingPage[sectionType],
-          ...data,
-        };
-      }
-    },
-
-    updateLocalPlanContent: (state, action) => {
-      const { planId, data } = action.payload;
-      const planIndex = state.plans.all.findIndex((plan) => plan.id === planId);
-      if (planIndex !== -1) {
-        state.plans.all[planIndex] = { ...state.plans.all[planIndex], ...data };
-      }
+    // Set action loading state
+    setActionLoading: (state, action) => {
+      state.actionLoading = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch landing page content
-      .addCase(fetchLandingPageContent.pending, (state) => {
-        state.sectionsLoading = true;
+      // Fetch content and plans
+      .addCase(fetchContentAndPlans.pending, (state) => {
+        state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchLandingPageContent.fulfilled, (state, action) => {
-        state.sectionsLoading = false;
+      .addCase(fetchContentAndPlans.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const { content, plans, fromCache, timestamp } = action.payload;
 
-        // Organize content by sections
-        const content = action.payload;
-        if (Array.isArray(content)) {
-          content.forEach((section) => {
-            if (section.section_type) {
-              state.landingPage[section.section_type] = section;
-            }
-          });
-        } else if (content && typeof content === "object") {
-          Object.keys(content).forEach((key) => {
-            if (Object.prototype.hasOwnProperty.call(state.landingPage, key)) {
-              state.landingPage[key] = content[key];
-            }
-          });
+        if (!fromCache) {
+          state.content = content;
+          state.plans = plans;
+          state.lastFetched = timestamp;
         }
-
-        state.contentStats.lastUpdated = new Date().toISOString();
-      })
-      .addCase(fetchLandingPageContent.rejected, (state, action) => {
-        state.sectionsLoading = false;
-        state.error = action.payload;
-      })
-
-      // Fetch about content
-      .addCase(fetchAboutContent.fulfilled, (state, action) => {
-        state.landingPage.about = action.payload;
-      })
-
-      // Fetch plans content
-      .addCase(fetchPlansContent.pending, (state) => {
-        state.plansLoading = true;
         state.error = null;
       })
-      .addCase(fetchPlansContent.fulfilled, (state, action) => {
-        state.plansLoading = false;
-        const { allPlans, plansByCategory } = action.payload;
-
-        state.plans.all = allPlans;
-        state.plans.byCategory = plansByCategory;
-        state.contentStats.totalPlans = allPlans.length;
-      })
-      .addCase(fetchPlansContent.rejected, (state, action) => {
-        state.plansLoading = false;
+      .addCase(fetchContentAndPlans.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
 
       // Update section
-      .addCase(updateLandingPageSection.pending, (state) => {
-        state.saveLoading = true;
+      .addCase(updateSection.pending, (state) => {
+        state.actionLoading = true;
         state.error = null;
+        state.success = null;
       })
-      .addCase(updateLandingPageSection.fulfilled, (state, action) => {
-        state.saveLoading = false;
-        const { sectionId, data } = action.payload;
+      .addCase(updateSection.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        const { sectionType, updatedSection } = action.payload;
 
-        // Update the section in state
-        Object.keys(state.landingPage).forEach((key) => {
-          if (
-            state.landingPage[key] &&
-            state.landingPage[key].id === sectionId
-          ) {
-            state.landingPage[key] = { ...state.landingPage[key], ...data };
-          }
-        });
+        if (sectionType === "about") {
+          state.content.about = {
+            id: updatedSection.id,
+            title_main: updatedSection.about_title_main,
+            title_highlighted: updatedSection.about_title_highlighted,
+            title_secondary: updatedSection.about_title_secondary,
+            description: updatedSection.about_description,
+            badge_text: updatedSection.about_badge_text,
+          };
+        } else if (sectionType === "plans") {
+          state.content.plans_section = {
+            id: updatedSection.id,
+            title_main: updatedSection.plans_title_main,
+            title_highlighted: updatedSection.plans_title_highlighted,
+            title_secondary: updatedSection.plans_title_secondary,
+            description: updatedSection.plans_description,
+            badge_text: updatedSection.plans_badge_text,
+          };
+        }
 
-        state.editingContent.hasChanges = false;
-        state.contentStats.lastUpdated = new Date().toISOString();
+        state.success = "تم حفظ التغييرات بنجاح";
+        state.editingSection = null;
+
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+          state.success = null;
+        }, 3000);
       })
-      .addCase(updateLandingPageSection.rejected, (state, action) => {
-        state.saveLoading = false;
+      .addCase(updateSection.rejected, (state, action) => {
+        state.actionLoading = false;
         state.error = action.payload;
       })
 
       // Update plan
       .addCase(updatePlan.pending, (state) => {
-        state.saveLoading = true;
+        state.actionLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(updatePlan.fulfilled, (state, action) => {
-        state.saveLoading = false;
-        const { planId, data } = action.payload;
+        state.actionLoading = false;
+        const updatedPlan = action.payload;
 
-        // Update plan in all plans array
-        const planIndex = state.plans.all.findIndex(
-          (plan) => plan.id === planId
+        state.plans = state.plans.map((plan) =>
+          plan.id === updatedPlan.id ? updatedPlan : plan
         );
-        if (planIndex !== -1) {
-          state.plans.all[planIndex] = {
-            ...state.plans.all[planIndex],
-            ...data,
-          };
-        }
 
-        // Update plan in byCategory object
-        Object.keys(state.plans.byCategory).forEach((category) => {
-          const categoryPlanIndex = state.plans.byCategory[category].findIndex(
-            (plan) => plan.id === planId
-          );
-          if (categoryPlanIndex !== -1) {
-            state.plans.byCategory[category][categoryPlanIndex] = {
-              ...state.plans.byCategory[category][categoryPlanIndex],
-              ...data,
-            };
-          }
-        });
+        state.success = "تم حفظ الخطة بنجاح";
 
-        state.editingContent.hasChanges = false;
-        state.contentStats.lastUpdated = new Date().toISOString();
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+          state.success = null;
+        }, 3000);
       })
       .addCase(updatePlan.rejected, (state, action) => {
-        state.saveLoading = false;
+        state.actionLoading = false;
         state.error = action.payload;
       })
 
       // Create plan
       .addCase(createPlan.pending, (state) => {
-        state.saveLoading = true;
+        state.actionLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(createPlan.fulfilled, (state, action) => {
-        state.saveLoading = false;
-        const newPlan = action.payload;
+        state.actionLoading = false;
+        state.plans.push(action.payload);
+        state.success = "تم إضافة الخطة بنجاح";
 
-        // Add to all plans
-        state.plans.all.push(newPlan);
-
-        // Add to category
-        if (newPlan.plan_type && state.plans.byCategory[newPlan.plan_type]) {
-          state.plans.byCategory[newPlan.plan_type].push(newPlan);
-        }
-
-        state.contentStats.totalPlans += 1;
-        state.contentStats.lastUpdated = new Date().toISOString();
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+          state.success = null;
+        }, 3000);
       })
       .addCase(createPlan.rejected, (state, action) => {
-        state.saveLoading = false;
+        state.actionLoading = false;
         state.error = action.payload;
       })
 
       // Delete plan
       .addCase(deletePlan.pending, (state) => {
-        state.saveLoading = true;
+        state.actionLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(deletePlan.fulfilled, (state, action) => {
-        state.saveLoading = false;
+        state.actionLoading = false;
         const planId = action.payload;
 
-        // Remove from all plans
-        state.plans.all = state.plans.all.filter((plan) => plan.id !== planId);
+        state.plans = state.plans.filter((plan) => plan.id !== planId);
+        state.success = "تم حذف الخطة بنجاح";
 
-        // Remove from categories
-        Object.keys(state.plans.byCategory).forEach((category) => {
-          state.plans.byCategory[category] = state.plans.byCategory[
-            category
-          ].filter((plan) => plan.id !== planId);
-        });
-
-        state.contentStats.totalPlans -= 1;
-        state.contentStats.lastUpdated = new Date().toISOString();
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+          state.success = null;
+        }, 3000);
       })
       .addCase(deletePlan.rejected, (state, action) => {
-        state.saveLoading = false;
+        state.actionLoading = false;
         state.error = action.payload;
-      })
-
-      // Upload file
-      .addCase(uploadContentFile.pending, (state) => {
-        state.uploads.isUploading = true;
-        state.uploads.progress = 0;
-        state.error = null;
-      })
-      .addCase(uploadContentFile.fulfilled, (state, action) => {
-        state.uploads.isUploading = false;
-        state.uploads.progress = 100;
-        state.uploads.uploadedFiles.push(action.payload);
-      })
-      .addCase(uploadContentFile.rejected, (state, action) => {
-        state.uploads.isUploading = false;
-        state.uploads.progress = 0;
-        state.error = action.payload;
-      })
-
-      // Fetch content history
-      .addCase(fetchContentHistory.fulfilled, (state, action) => {
-        state.contentHistory = action.payload;
       });
   },
 });
 
+// Export actions
 export const {
-  startEditing,
-  stopEditing,
-  markAsChanged,
-  discardChanges,
-  enablePreviewMode,
-  disablePreviewMode,
-  updateUploadProgress,
-  startUpload,
-  finishUpload,
-  clearUploadedFiles,
-  updateContentStats,
-  clearError,
-  clearContentManagement,
-  updateLocalSectionContent,
-  updateLocalPlanContent,
+  setEditingSection,
+  clearEditingSection,
+  clearMessages,
+  invalidateCache,
+  setActionLoading,
 } = contentManagementSlice.actions;
 
-export default contentManagementSlice.reducer;
-
 // Selectors
-export const selectContentManagement = (state) => state.contentManagement;
-export const selectLandingPageContent = (state) =>
-  state.contentManagement.landingPage;
+export const selectContent = (state) => state.contentManagement.content;
 export const selectPlans = (state) => state.contentManagement.plans;
-export const selectEditingContent = (state) =>
-  state.contentManagement.editingContent;
-export const selectUploads = (state) => state.contentManagement.uploads;
-export const selectPreviewMode = (state) => state.contentManagement.previewMode;
-export const selectPreviewData = (state) => state.contentManagement.previewData;
-export const selectContentStats = (state) =>
-  state.contentManagement.contentStats;
-export const selectContentHistory = (state) =>
-  state.contentManagement.contentHistory;
-export const selectSectionsLoading = (state) =>
-  state.contentManagement.sectionsLoading;
-export const selectPlansLoading = (state) =>
-  state.contentManagement.plansLoading;
-export const selectSaveLoading = (state) => state.contentManagement.saveLoading;
-export const selectContentManagementError = (state) =>
-  state.contentManagement.error;
+export const selectContentLoading = (state) =>
+  state.contentManagement.isLoading;
+export const selectActionLoading = (state) =>
+  state.contentManagement.actionLoading;
+export const selectContentError = (state) => state.contentManagement.error;
+export const selectContentSuccess = (state) => state.contentManagement.success;
+export const selectEditingSection = (state) =>
+  state.contentManagement.editingSection;
+export const selectCacheInfo = (state) => ({
+  lastFetched: state.contentManagement.lastFetched,
+  cacheExpiry: state.contentManagement.cacheExpiry,
+});
+
+// Helper selector to check if cache is fresh
+export const selectIsCacheFresh = (state) => {
+  const { lastFetched, cacheExpiry } = state.contentManagement;
+  if (!lastFetched) return false;
+
+  const now = Date.now();
+  const timeSinceLastFetch = now - lastFetched;
+  return timeSinceLastFetch < cacheExpiry;
+};
+
+export default contentManagementSlice.reducer;

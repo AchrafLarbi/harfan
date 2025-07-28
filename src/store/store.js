@@ -4,6 +4,7 @@ import apiReducer from "./slices/apiSlice";
 import adminReducer from "./slices/adminSlice";
 import dashboardReducer from "./slices/dashboardSlice";
 import userManagementReducer from "./slices/userManagementSlice";
+import contentManagementReducer from "./slices/contentManagementSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     admin: adminReducer,
     dashboard: dashboardReducer,
     userManagement: userManagementReducer,
+    contentManagement: contentManagementReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

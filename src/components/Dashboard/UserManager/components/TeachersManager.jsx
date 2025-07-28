@@ -10,6 +10,7 @@ import {
   selectTeachersLoading,
   selectUserManagementError,
   selectTeacherFilters,
+  invalidateTeachersCache,
 } from "../../../../store/slices/userManagementSlice";
 
 const TeachersManager = () => {
@@ -23,7 +24,7 @@ const TeachersManager = () => {
   const error = useSelector(selectUserManagementError);
   const filters = useSelector(selectTeacherFilters);
 
-  // Initial fetch on mount only
+  // Initial fetch on mount - will use cache if available
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
@@ -35,6 +36,7 @@ const TeachersManager = () => {
           approvalStatus: "all",
           sortBy: "created_at",
           sortOrder: "desc",
+          forceRefresh: false, // Use cache if available
         })
       );
     }
@@ -55,7 +57,7 @@ const TeachersManager = () => {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    // Fetch with new search term (debounced)
+    // Fetch with new search term (debounced) - force refresh for new search
     searchTimeoutRef.current = setTimeout(() => {
       dispatch(
         fetchTeachers({
@@ -65,6 +67,7 @@ const TeachersManager = () => {
           approvalStatus: filters.approvalStatus,
           sortBy: filters.sortBy,
           sortOrder: filters.sortOrder,
+          forceRefresh: true, // Force refresh for search
         })
       );
     }, 300);
@@ -79,6 +82,22 @@ const TeachersManager = () => {
         approvalStatus: filters.approvalStatus,
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
+        forceRefresh: true, // Force refresh on retry
+      })
+    );
+  };
+
+  const handleRefresh = () => {
+    dispatch(invalidateTeachersCache());
+    dispatch(
+      fetchTeachers({
+        page: 1,
+        search: filters.search,
+        status: filters.status,
+        approvalStatus: filters.approvalStatus,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+        forceRefresh: true,
       })
     );
   };
@@ -159,7 +178,27 @@ const TeachersManager = () => {
           <h2 className="text-xl font-semibold text-gray-900">
             قائمة الأساتذة ({teachers.length})
           </h2>
-          <div className="flex space-x-4">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleRefresh}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              disabled={loading}
+            >
+              <svg
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span>تحديث</span>
+            </button>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
               نشط: {activeTeachers.length}
             </span>

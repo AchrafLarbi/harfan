@@ -7,6 +7,20 @@ const initialState = {
   students: [],
   teachers: [],
 
+  // Cache metadata
+  cache: {
+    students: {
+      lastFetched: null,
+      cacheExpiry: 5 * 60 * 1000, // 5 minutes
+      lastParams: null,
+    },
+    teachers: {
+      lastFetched: null,
+      cacheExpiry: 5 * 60 * 1000, // 5 minutes
+      lastParams: null,
+    },
+  },
+
   // Pagination and filtering
   pagination: {
     students: {
@@ -78,10 +92,34 @@ export const fetchStudents = createAsyncThunk(
       status = "all",
       sortBy = "created_at",
       sortOrder = "desc",
+      forceRefresh = false,
     },
-    { rejectWithValue }
+    { getState, rejectWithValue }
   ) => {
     try {
+      const state = getState();
+      const { cache, students } = state.userManagement;
+      const currentParams = { page, search, status, sortBy, sortOrder };
+
+      // Check if we have cached data and it's still fresh (unless forced refresh)
+      if (!forceRefresh && students.length > 0 && cache.students.lastFetched) {
+        const now = Date.now();
+        const timeSinceLastFetch = now - cache.students.lastFetched;
+        const paramsChanged =
+          JSON.stringify(currentParams) !==
+          JSON.stringify(cache.students.lastParams);
+
+        if (timeSinceLastFetch < cache.students.cacheExpiry && !paramsChanged) {
+          // Return cached data
+          return {
+            fromCache: true,
+            data: { students },
+            ...currentParams,
+          };
+        }
+      }
+
+      // Fetch fresh data
       const data = await userManagementAPI.getStudents({
         page,
         search,
@@ -89,7 +127,18 @@ export const fetchStudents = createAsyncThunk(
         sort_by: sortBy,
         sort_order: sortOrder,
       });
-      return { data, page, search, status, sortBy, sortOrder };
+
+      return {
+        data,
+        page,
+        search,
+        status,
+        sortBy,
+        sortOrder,
+        fromCache: false,
+        timestamp: Date.now(),
+        params: currentParams,
+      };
     } catch (error) {
       return rejectWithValue(error.message || "خطأ في تحميل قائمة الطلاب");
     }
@@ -106,10 +155,41 @@ export const fetchTeachers = createAsyncThunk(
       approvalStatus = "all",
       sortBy = "created_at",
       sortOrder = "desc",
+      forceRefresh = false,
     },
-    { rejectWithValue }
+    { getState, rejectWithValue }
   ) => {
     try {
+      const state = getState();
+      const { cache, teachers } = state.userManagement;
+      const currentParams = {
+        page,
+        search,
+        status,
+        approvalStatus,
+        sortBy,
+        sortOrder,
+      };
+
+      // Check if we have cached data and it's still fresh (unless forced refresh)
+      if (!forceRefresh && teachers.length > 0 && cache.teachers.lastFetched) {
+        const now = Date.now();
+        const timeSinceLastFetch = now - cache.teachers.lastFetched;
+        const paramsChanged =
+          JSON.stringify(currentParams) !==
+          JSON.stringify(cache.teachers.lastParams);
+
+        if (timeSinceLastFetch < cache.teachers.cacheExpiry && !paramsChanged) {
+          // Return cached data
+          return {
+            fromCache: true,
+            data: { teachers },
+            ...currentParams,
+          };
+        }
+      }
+
+      // Fetch fresh data
       const data = await userManagementAPI.getTeachers({
         page,
         search,
@@ -118,7 +198,19 @@ export const fetchTeachers = createAsyncThunk(
         sort_by: sortBy,
         sort_order: sortOrder,
       });
-      return { data, page, search, status, approvalStatus, sortBy, sortOrder };
+
+      return {
+        data,
+        page,
+        search,
+        status,
+        approvalStatus,
+        sortBy,
+        sortOrder,
+        fromCache: false,
+        timestamp: Date.now(),
+        params: currentParams,
+      };
     } catch (error) {
       return rejectWithValue(error.message || "خطأ في تحميل قائمة الأساتذة");
     }
@@ -306,6 +398,24 @@ const userManagementSlice = createSlice({
       state.error = null;
     },
 
+    // Cache management
+    invalidateStudentsCache: (state) => {
+      state.cache.students.lastFetched = null;
+      state.cache.students.lastParams = null;
+    },
+
+    invalidateTeachersCache: (state) => {
+      state.cache.teachers.lastFetched = null;
+      state.cache.teachers.lastParams = null;
+    },
+
+    invalidateAllCache: (state) => {
+      state.cache.students.lastFetched = null;
+      state.cache.students.lastParams = null;
+      state.cache.teachers.lastFetched = null;
+      state.cache.teachers.lastParams = null;
+    },
+
     clearUserManagement: (state) => {
       Object.assign(state, initialState);
     },
@@ -319,16 +429,31 @@ const userManagementSlice = createSlice({
       })
       .addCase(fetchStudents.fulfilled, (state, action) => {
         state.studentsLoading = false;
-        const { data, page, search, status, sortBy, sortOrder } =
-          action.payload;
+        const {
+          data,
+          page,
+          search,
+          status,
+          sortBy,
+          sortOrder,
+          fromCache,
+          timestamp,
+          params,
+        } = action.payload;
 
-        state.students = data.results || data;
+        if (!fromCache) {
+          state.students = data.results || data;
+          state.cache.students.lastFetched = timestamp;
+          state.cache.students.lastParams = params;
+        }
+
         state.pagination.students = {
           currentPage: page,
           itemsPerPage: state.pagination.students.itemsPerPage,
-          totalItems: data.count || data.length,
+          totalItems: data.count || data.length || state.students.length,
           totalPages: Math.ceil(
-            (data.count || data.length) / state.pagination.students.itemsPerPage
+            (data.count || data.length || state.students.length) /
+              state.pagination.students.itemsPerPage
           ),
         };
         state.filters.students = { search, status, sortBy, sortOrder };
@@ -354,15 +479,24 @@ const userManagementSlice = createSlice({
           approvalStatus,
           sortBy,
           sortOrder,
+          fromCache,
+          timestamp,
+          params,
         } = action.payload;
 
-        state.teachers = data.results || data;
+        if (!fromCache) {
+          state.teachers = data.results || data;
+          state.cache.teachers.lastFetched = timestamp;
+          state.cache.teachers.lastParams = params;
+        }
+
         state.pagination.teachers = {
           currentPage: page,
           itemsPerPage: state.pagination.teachers.itemsPerPage,
-          totalItems: data.count || data.length,
+          totalItems: data.count || data.length || state.teachers.length,
           totalPages: Math.ceil(
-            (data.count || data.length) / state.pagination.teachers.itemsPerPage
+            (data.count || data.length || state.teachers.length) /
+              state.pagination.teachers.itemsPerPage
           ),
         };
         state.filters.teachers = {
@@ -410,11 +544,17 @@ const userManagementSlice = createSlice({
           if (student) {
             student.is_active = activate;
           }
+          // Invalidate students cache since data changed
+          state.cache.students.lastFetched = null;
+          state.cache.students.lastParams = null;
         } else {
           const teacher = state.teachers.find((t) => t.id === userId);
           if (teacher) {
             teacher.is_active = activate;
           }
+          // Invalidate teachers cache since data changed
+          state.cache.teachers.lastFetched = null;
+          state.cache.teachers.lastParams = null;
         }
       })
       .addCase(activateUser.rejected, (state, action) => {
@@ -435,6 +575,10 @@ const userManagementSlice = createSlice({
           teacher.is_approved = approve;
           teacher.approval_status = approve ? "approved" : "rejected";
         }
+
+        // Invalidate teachers cache since data changed
+        state.cache.teachers.lastFetched = null;
+        state.cache.teachers.lastParams = null;
       })
       .addCase(approveTeacher.rejected, (state, action) => {
         state.actionLoading = false;
@@ -454,11 +598,17 @@ const userManagementSlice = createSlice({
           state.selectedStudents = state.selectedStudents.filter(
             (id) => id !== userId
           );
+          // Invalidate students cache since data changed
+          state.cache.students.lastFetched = null;
+          state.cache.students.lastParams = null;
         } else {
           state.teachers = state.teachers.filter((t) => t.id !== userId);
           state.selectedTeachers = state.selectedTeachers.filter(
             (id) => id !== userId
           );
+          // Invalidate teachers cache since data changed
+          state.cache.teachers.lastFetched = null;
+          state.cache.teachers.lastParams = null;
         }
       })
       .addCase(deleteUser.rejected, (state, action) => {
@@ -506,6 +656,9 @@ export const {
   openUserDetailsModal,
   closeUserDetailsModal,
   clearError,
+  invalidateStudentsCache,
+  invalidateTeachersCache,
+  invalidateAllCache,
   clearUserManagement,
 } = userManagementSlice.actions;
 
