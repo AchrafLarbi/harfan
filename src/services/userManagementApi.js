@@ -2,8 +2,8 @@ import { store } from "../store/store";
 
 // API Configuration
 const API_CONFIG = {
-  baseURL: "https://0vrkzhm5-8000.uks1.devtunnels.ms",
-  timeout: 10000,
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/",
+  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
 };
 
 // Helper function to get auth token

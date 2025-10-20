@@ -27,10 +27,10 @@ import {
 
 // API Configuration
 const API_CONFIG = {
-  // Django backend URL
-  baseURL: "https://0vrkzhm5-8000.uks1.devtunnels.ms/", // Django default port
-  version: "v1",
-  timeout: 10000,
+  // Django backend URL from environment variable
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/", // Fallback to localhost
+  version: import.meta.env.VITE_API_VERSION || "v1",
+  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
 };
 
 // Helper function to decode JWT token
