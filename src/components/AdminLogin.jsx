@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import {
-  FaChalkboardTeacher,
-  FaBookOpen,
   FaCheckCircle,
   FaStar,
   FaShieldAlt,
@@ -12,13 +10,11 @@ import {
 } from "react-icons/fa";
 import logo2 from "../assets/logo/browserLogo.png";
 import background from "../assets/Landing Page.png";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useAuth } from "../hooks/useAuth";
 import { loginFailure } from "../store/slices/authSlice";
-import { store } from "../store/store";
 
-export default function Login() {
-  const [role, setRole] = useState("student");
+export default function AdminLogin() {
   const [remember, setRemember] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,42 +31,33 @@ export default function Login() {
       const loginData = {
         email,
         password,
-        role,
+        role: "admin",
         remember,
       };
 
-      console.log("Login attempt with role:", role);
+      console.log("Admin login attempt");
 
       const result = await login(loginData);
-      console.log("Login successful!", result);
+      console.log("Admin login successful!", result);
 
       // Get user data directly from login result
       const userData = result.user || {};
 
       console.log("User data from login result:", userData);
 
-      // Validate user role matches selected role
-      if (role === "teacher") {
-        // Check if user is a teacher
-        if (userData.is_teacher || userData.role === "teacher") {
-          console.log("Redirecting teacher to /teacher-dashboard");
-          window.location.href = "/teacher-dashboard";
-        } else {
-          const errorMsg = "هذا الحساب ليس حساب معلم";
-          dispatch(loginFailure(errorMsg));
-        }
+      // Validate user has admin privileges
+      const isAdmin = userData.is_staff || userData.is_superuser;
+
+      if (isAdmin) {
+        console.log("Redirecting admin to /admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        // Check if user is a student
-        if (!userData.is_staff && !userData.is_superuser) {
-          console.log("Redirecting student to /student-dashboard");
-          window.location.href = "/student-dashboard";
-        } else {
-          const errorMsg = "هذا الحساب ليس حساب طالب.  ";
-          dispatch(loginFailure(errorMsg));
-        }
+        const errorMsg =
+          "ليس لديك صلاحيات إدارية. الرجاء استخدام /login للطلاب والمعلمين";
+        dispatch(loginFailure(errorMsg));
       }
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Admin login failed:", err);
       const errorMsg =
         err.message || "حدث خطأ أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى";
       dispatch(loginFailure(errorMsg));
@@ -99,72 +86,12 @@ export default function Login() {
       <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row-reverse items-center justify-center gap-8 md:gap-16 flex-1 min-h-[calc(100vh-120px)]">
         <div className="flex-1 max-w-md bg-white rounded-2xl shadow-xl p-8 mt-4 mb-8 md:mb-0 md:mt-0 order-2 md:order-none">
           <h2 className="text-2xl font-bold mb-1 text-center text-gray-800">
-            تسجيل الدخول
+            تسجيل دخول المديرين
           </h2>
           <p className="text-gray-500 text-sm text-center mb-6">
-            اختر نوع حسابك للمتابعة -{" "}
-            {role === "teacher" ? "تسجيل دخول المعلمين" : "تسجيل دخول الطلاب"}
-            <br />
-            <span className="text-xs text-gray-400 mt-1 block">
-              المديرون يمكنهم الدخول باستخدام أي من الخيارين
-            </span>
+            أدخل بيانات حسابك الإداري للوصول إلى لوحة التحكم
           </p>
-          <div className="flex mb-6 gap-2 rounded-lg relative overflow-hidden p-6">
-            <motion.div
-              layout
-              initial={false}
-              animate={{
-                x: role === "teacher" ? 0 : "100%",
-                width: "50%",
-                background: "#fff",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                borderRadius: "0.75rem",
-              }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute top-0 left-0 h-full z-0"
-              style={{ willChange: "transform, width" }}
-            />
-            <button
-              type="button"
-              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${
-                  role === "teacher"
-                    ? "text-primary border-primary shadow"
-                    : "text-gray-400 border-transparent"
-                }
-                hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
-              onClick={() => setRole("teacher")}
-            >
-              <motion.span
-                animate={{ scale: role === "teacher" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex items-center gap-2"
-              >
-                <FaChalkboardTeacher /> مدرس
-              </motion.span>
-            </button>
-            <button
-              type="button"
-              className={`flex-1 py-2 rounded-lg text-lg font-medium transition-all flex items-center justify-center gap-2 border relative z-10 focus:outline-none
-                ${
-                  role === "student"
-                    ? "text-primary border-primary shadow"
-                    : "text-gray-400 border-transparent"
-                }
-                hover:text-primary hover:bg-primary/10 hover:scale-105 active:scale-100`}
-              onClick={() => setRole("student")}
-            >
-              <motion.span
-                animate={{ scale: role === "student" ? 1.08 : 1 }}
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="flex items-center gap-2"
-              >
-                <FaBookOpen /> طالب
-              </motion.span>
-            </button>
-          </div>
+
           <form className="space-y-4" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
@@ -180,7 +107,7 @@ export default function Login() {
                 <input
                   className="w-full p-2 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition"
                   type="email"
-                  placeholder="me@email.com"
+                  placeholder="admin@harfan.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -242,13 +169,25 @@ export default function Login() {
               )}
             </button>
           </form>
+
+          <div className="mt-6 text-center text-sm text-gray-600">
+            <p>
+              إذا كنت طالباً أو معلماً،{" "}
+              <a
+                href="/login"
+                className="text-primary font-bold hover:underline"
+              >
+                اضغط هنا
+              </a>
+            </p>
+          </div>
         </div>
 
         <div className="flex-1 flex items-center justify-center md:justify-start bg-transparent order-1 md:order-none">
           <div className="max-w-md text-center md:text-right w-full px-2 md:px-0">
             <div className="mb-6 md:mb-8">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 flex flex-col sm:flex-row items-center md:items-end justify-center md:justify-end gap-2 md:gap-4">
-                <div className="text-[#374151] font-bold">أهلاً بعودتك الى</div>
+                <div className="text-[#374151] font-bold">لوحة التحكم</div>
                 <div className="flex flex-col items-center text-primary relative">
                   <svg
                     className="absolute -top-3 md:-top-4 -left-4 md:-left-6 w-6 h-5 md:w-8 md:h-7"
@@ -277,7 +216,7 @@ export default function Login() {
                 </div>
               </h1>
               <p className="text-gray-500 text-base md:text-lg font-medium mb-6 md:mb-8 mt-2 text-center md:text-right">
-                استكمل رحلتك التعليمية في تعلم العربية والقرآن الكريم.
+                إدارة المحتوى والمستخدمين والمقررات الدراسية
               </p>
             </div>
             <ul className="space-y-4 md:space-y-6 mb-8 md:mb-10 w-full">
@@ -285,30 +224,21 @@ export default function Login() {
                 <span className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full ml-3">
                   <FaCheckCircle className="text-primary text-lg md:text-2xl" />
                 </span>
-                <span>دروس تفاعلية مع أفضل المعلمين</span>
+                <span>إدارة كاملة للمحتوى التعليمي</span>
               </li>
               <li className="flex items-center justify-start text-gray-700 text-base md:text-xl font-medium">
                 <span className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full ml-3">
                   <FaStar className="text-primary text-lg md:text-2xl" />
                 </span>
-                <span>تتبع تقدمك و احصل على شهادات</span>
+                <span>مراقبة أداء المعلمين والطلاب</span>
               </li>
               <li className="flex items-center justify-start text-gray-700 text-base md:text-xl font-medium">
                 <span className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full ml-3">
                   <FaShieldAlt className="text-primary text-lg md:text-2xl" />
                 </span>
-                <span>بيئة تعليمية آمنة و محمية</span>
+                <span>حماية كاملة لبيانات النظام</span>
               </li>
             </ul>
-            <div className="text-base md:text-lg text-gray-700 text-center md:text-right">
-              ليس لديك حساب؟
-              <a
-                href="/signup"
-                className="text-primary font-extrabold hover:underline mr-2 md:mr-4"
-              >
-                إنشاء حساب جديد
-              </a>
-            </div>
           </div>
         </div>
       </div>
