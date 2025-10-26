@@ -9,7 +9,7 @@ import {
   updateProfileStart,
   updateProfileSuccess,
   updateProfileFailure,
-} from "../store/slicesauthSlice";
+} from "../store/slices/authSlice";
 import {
   apiCallStart,
   apiCallSuccess,
