@@ -9,7 +9,7 @@ import {
   updateProfileStart,
   updateProfileSuccess,
   updateProfileFailure,
-} from "../store/slices/authSlice";
+} from "../store/slicesauthSlice";
 import {
   apiCallStart,
   apiCallSuccess,
@@ -101,12 +101,12 @@ const apiCall = async (endpoint, options = {}) => {
 
     // Public endpoints that don't require authentication
     const publicEndpoints = [
-      "/auth/register",
-      "/auth/login",
+      "auth/register",
+      "auth/login",
       "/verify-email",
-      "/auth/request-reset-password/",
-      "/auth/reset-password/",
-      "/auth/token/refresh/",
+      "auth/request-reset-password/",
+      "auth/reset-password/",
+      "auth/token/refresh/",
     ];
     const isPublicEndpoint = publicEndpoints.some((publicEndpoint) =>
       endpoint.startsWith(publicEndpoint)
@@ -198,7 +198,7 @@ export const authAPI = {
     try {
       dispatch(loginStart());
 
-      const response = await apiCall("/auth/login", {
+      const response = await apiCall("auth/login", {
         method: "POST",
         credentials: "include", // Important: This allows setting httpOnly cookies
         body: JSON.stringify({
@@ -284,7 +284,7 @@ export const authAPI = {
         console.log("Signup data being sent as FormData" + userData);
 
         // For FormData, we need to send it directly without JSON.stringify
-        const response = await apiCall("/auth/register", {
+        const response = await apiCall("auth/register", {
           method: "POST",
           body: userData,
           headers: {
@@ -338,7 +338,7 @@ export const authAPI = {
 
         console.log("Signup data being sent:", formattedData);
 
-        const response = await apiCall("/auth/register", {
+        const response = await apiCall("auth/register", {
           method: "POST",
           body: JSON.stringify(formattedData),
         });
@@ -381,7 +381,7 @@ export const authAPI = {
 
       // Make logout request to clear httpOnly refresh token cookie
       try {
-        await apiCall("/auth/logout", {
+        await apiCall("auth/logout", {
           method: "POST",
           credentials: "include",
         });
@@ -451,7 +451,7 @@ export const authAPI = {
   // Request password reset
   requestPasswordReset: async (email) => {
     try {
-      const response = await apiCall("/auth/request-reset-password/", {
+      const response = await apiCall("auth/request-reset-password/", {
         method: "POST",
         body: JSON.stringify({
           email: email,
@@ -469,7 +469,7 @@ export const authAPI = {
   resetPassword: async (newPassword, encodedPk, token) => {
     try {
       const response = await apiCall(
-        `/auth/reset-password/${encodedPk}/${token}/`,
+        `auth/reset-password/${encodedPk}/${token}/`,
         {
           method: "PATCH",
           body: JSON.stringify({
