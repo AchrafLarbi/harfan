@@ -66,27 +66,27 @@ const apiCall = async (endpoint, options = {}) => {
 export const userManagementAPI = {
   // Get all students
   getStudents: async () => {
-    return await apiCall("/adminmanagement/students/");
+    return await apiCall("adminmanagement/students/");
   },
 
   // Get all teachers
   getTeachers: async () => {
-    return await apiCall("/adminmanagement/teachers/");
+    return await apiCall("adminmanagement/teachers/");
   },
 
   // Get student by ID
   getStudentById: async (studentId) => {
-    return await apiCall(`/adminmanagement/students/${studentId}/`);
+    return await apiCall(`adminmanagement/students/${studentId}/`);
   },
 
   // Get teacher by ID
   getTeacherById: async (teacherId) => {
-    return await apiCall(`/adminmanagement/teachers/${teacherId}/`);
+    return await apiCall(`adminmanagement/teachers/${teacherId}/`);
   },
 
   // Activate/Deactivate teacher
   activateTeacher: async (teacherId) => {
-    return await apiCall(`/adminmanagement/teachers/${teacherId}/activate/`, {
+    return await apiCall(`adminmanagement/teachers/${teacherId}/activate/`, {
       method: "PATCH",
     });
   },
